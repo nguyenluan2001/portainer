@@ -1,0 +1,10 @@
+FROM luannguyen2001/ntluan_base
+
+WORKDIR /app
+
+COPY ./script/entrypoint.dev.sh /app/entrypoint.dev.sh
+RUN chmod +x /app/entrypoint.dev.sh
+
+EXPOSE 5173 5174
+
+ENTRYPOINT [ "bash" ]
