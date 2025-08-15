@@ -4,7 +4,10 @@ command=$1
 PROJECT_PATH="."
 
 function build(){
-    docker build -t portainer_dev_img -f Dockerfile.dev .
+    docker build -t portainer_dev_img -f Dockerfile.dev \
+    --build-arg UID=${UID} \
+    --build-arg GID=${GID} \
+    .
 }
 
 function run(){
@@ -24,7 +27,7 @@ function run(){
     --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
     --mount type=bind,source=${PROJECT_PATH}/server,target=/app/server \
     --mount type=bind,source=${PROJECT_PATH}/client,target=/app/client \
-    --mount type=bind,source=${PROJECT_PATH}/.go,target=/go \
+    --mount type=bind,source=${PROJECT_PATH}/.go,target=/go/pkg/mod \
     portainer_dev_img \
     -c "/app/entrypoint.dev.sh"
 }

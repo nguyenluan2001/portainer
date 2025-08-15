@@ -1,4 +1,4 @@
-FROM luannguyen2001/ntluan_base
+FROM luannguyen2001/ntluan_base:latest
 
 WORKDIR /app
 

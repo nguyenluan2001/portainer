@@ -20,6 +20,7 @@ func InitRouter() {
 	apiRouter.Get("/check", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("Server on")
 	})
+	// apiRouter.Get("/containers", )
 
 	// WebSocket route handler
 	// socketRouter := router.Use("/ws", middleware.UpgradeWebSocket)
