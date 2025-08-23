@@ -18,10 +18,11 @@ if [ -t 0 ]; then
     tmux select-pane -t $PROJECT_NAME:0.1 -T 'client'
 
     # Send commands to each pane
-    tmux send-keys -t $PROJECT_NAME:0.0 'cd server' C-m
+    tmux send-keys -t $PROJECT_NAME:0.0 'cd server/cmd' C-m
+    tmux send-keys -t $PROJECT_NAME:0.0 'go run main.go' C-m
     tmux send-keys -t $PROJECT_NAME:0.1 'cd client' C-m
     tmux send-keys -t $PROJECT_NAME:0.1 'bun install' C-m
-    tmux send-keys -t $PROJECT_NAME:0.1 'bun run dev --host' C-m
+    tmux send-keys -t $PROJECT_NAME:0.1 'bun run dev' C-m
   fi
 
   # Attach to the tmux session

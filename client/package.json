@@ -4,17 +4,31 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@tailwindcss/vite": "^4.1.12",
+    "@tanstack/react-query": "^5.85.3",
+    "@tanstack/react-router": "^1.131.18",
+    "@tanstack/react-router-devtools": "^1.131.18",
+    "@xterm/xterm": "^5.5.0",
+    "antd": "^5.27.0",
+    "axios": "^1.11.0",
+    "dayjs": "^1.11.13",
+    "lodash": "^4.17.21",
+    "path": "^0.12.7",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "tailwindcss": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@tanstack/router-plugin": "^1.131.18",
+    "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",

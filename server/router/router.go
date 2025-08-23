@@ -2,30 +2,37 @@ package router
 
 import (
 	"embed"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/nguyenluan2001/portainer/server/pkg/config"
+	app "github.com/nguyenluan2001/portainer/server/pkg/controller"
+	"github.com/nguyenluan2001/portainer/server/pkg/middleware"
 )
 
 var WebAssets embed.FS
 
-func InitRouter() {
+func InitRouter(app *app.App) {
 	router := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024,
 	})
-	router.Static("/", "./static")
-	router.Static("/share/*", "./static")
 
 	apiRouter := router.Group(config.API_PREFIX_PATH)
+	apiRouter.Use(cors.New())
 	apiRouter.Get("/check", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("Server on")
 	})
-	// apiRouter.Get("/containers", )
+	apiRouter.Get("/containers", app.GetContainers)
+	apiRouter.Get("/containers/:containerId", app.GetContainerDetail)
 
 	// WebSocket route handler
-	// socketRouter := router.Use("/ws", middleware.UpgradeWebSocket)
+	socketRouter := router.Group(config.API_SOCKET_PREFIX_PATH)
+	socketRouter.Use("/", middleware.UpgradeWebSocket)
 	// app.CollaborateHandler()
-	// socketRouter.Get("/ws", app.InitConnection())
-
+	socketRouter.Get("/attach", app.AttachContainer())
+	socketRouter.Get("/exec", app.ExecContainer())
+	app.SocketListener()
+	log.Println("Listening port 5174...")
 	router.Listen(":5174")
 }

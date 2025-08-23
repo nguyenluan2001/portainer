@@ -12,11 +12,15 @@ function build(){
 
 function run(){
     gomod_path="./.go"
+    runtimes_path="./runtimes"
 
     docker rm -f portainer_dev
 
     if [[ ! -e $gomod_path ]];then
         mkdir .go
+    fi
+    if [[ ! -e $runtimes_path ]];then
+        mkdir ./runtimes
     fi
 
     # --entrypoint /bin/bash /app/entrypoint.dev.sh \
@@ -28,6 +32,7 @@ function run(){
     --mount type=bind,source=${PROJECT_PATH}/server,target=/app/server \
     --mount type=bind,source=${PROJECT_PATH}/client,target=/app/client \
     --mount type=bind,source=${PROJECT_PATH}/.go,target=/go/pkg/mod \
+    --mount type=bind,source=${PROJECT_PATH}/runtimes,target=/app/runtimes \
     portainer_dev_img \
     -c "/app/entrypoint.dev.sh"
 }

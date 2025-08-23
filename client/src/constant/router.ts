@@ -1,0 +1,1 @@
+export const GET_LIST_CONTAINER_PATH = "/api/containers"
