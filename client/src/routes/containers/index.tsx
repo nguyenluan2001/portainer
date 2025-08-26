@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
 import { getListContainerProxy } from '@/services/proxy/container'
 import type { IContainerItem } from '@/type/container'
 import { useQuery } from '@tanstack/react-query'
@@ -29,12 +29,13 @@ const ContainerPage = () => {
             title: "Quick action",
             dataIndex: "Id",
             render(value, record, index) {
+                const isRunning = record.State === "running"
                 return (
                     <div className='flex items-center gap-2'>
                         <Tooltip title="Exec">
                             <div>
                                 <Link to={`${value}/exec`}>
-                                    <Button size="small" icon={<CodeIcon />} />
+                                    <Button disabled={!isRunning} size="small" icon={<CodeIcon />} />
                                 </Link>
                             </div>
                         </Tooltip>
@@ -42,7 +43,7 @@ const ContainerPage = () => {
                             <div>
 
                                 <Link to={`${value}/attach`}>
-                                    <Button size="small" icon={<Paperclip />} />
+                                    <Button disabled={!isRunning} size="small" icon={<Paperclip />} />
                                 </Link>
                             </div>
                         </Tooltip>
@@ -61,7 +62,6 @@ const ContainerPage = () => {
             },
         }
     ]
-    console.log("data", data)
     return (
         <Layout title="Containers" description="View and Manage your Containers">
             <div className="w-full h-full">

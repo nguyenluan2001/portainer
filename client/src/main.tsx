@@ -74,6 +74,16 @@ createRoot(document.getElementById('root')!).render(
               rowHoverBg: "var(--muted)",
               headerBg: "var(--card)",
               headerColor: "var(--card-foreground)",
+            },
+            Breadcrumb: {
+              itemColor: "var(--foreground)",
+              linkColor: "var(--foreground)",
+              linkHoverColor: "var(--mutedforeground)",
+              separatorColor: "var(--foreground)",
+              lastItemColor: "var(--muted-foreground)",
+            },
+            Divider: {
+              colorSplit: "var(--border)"
             }
           },
         }}

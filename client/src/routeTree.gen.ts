@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContainersIndexRouteImport } from './routes/containers/index'
+import { Route as ContainersContainerIdRouteRouteImport } from './routes/containers/$containerId/route'
+import { Route as ContainersContainerIdIndexRouteImport } from './routes/containers/$containerId/index'
 import { Route as ContainersContainerIdExecRouteImport } from './routes/containers/$containerId/exec'
 import { Route as ContainersContainerIdAttachRouteImport } from './routes/containers/$containerId/attach'
 
@@ -24,64 +26,85 @@ const ContainersIndexRoute = ContainersIndexRouteImport.update({
   path: '/containers/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContainersContainerIdRouteRoute =
+  ContainersContainerIdRouteRouteImport.update({
+    id: '/containers/$containerId',
+    path: '/containers/$containerId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ContainersContainerIdIndexRoute =
+  ContainersContainerIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ContainersContainerIdRouteRoute,
+  } as any)
 const ContainersContainerIdExecRoute =
   ContainersContainerIdExecRouteImport.update({
-    id: '/containers/$containerId/exec',
-    path: '/containers/$containerId/exec',
-    getParentRoute: () => rootRouteImport,
+    id: '/exec',
+    path: '/exec',
+    getParentRoute: () => ContainersContainerIdRouteRoute,
   } as any)
 const ContainersContainerIdAttachRoute =
   ContainersContainerIdAttachRouteImport.update({
-    id: '/containers/$containerId/attach',
-    path: '/containers/$containerId/attach',
-    getParentRoute: () => rootRouteImport,
+    id: '/attach',
+    path: '/attach',
+    getParentRoute: () => ContainersContainerIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/containers/$containerId': typeof ContainersContainerIdRouteRouteWithChildren
   '/containers': typeof ContainersIndexRoute
   '/containers/$containerId/attach': typeof ContainersContainerIdAttachRoute
   '/containers/$containerId/exec': typeof ContainersContainerIdExecRoute
+  '/containers/$containerId/': typeof ContainersContainerIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/containers': typeof ContainersIndexRoute
   '/containers/$containerId/attach': typeof ContainersContainerIdAttachRoute
   '/containers/$containerId/exec': typeof ContainersContainerIdExecRoute
+  '/containers/$containerId': typeof ContainersContainerIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/containers/$containerId': typeof ContainersContainerIdRouteRouteWithChildren
   '/containers/': typeof ContainersIndexRoute
   '/containers/$containerId/attach': typeof ContainersContainerIdAttachRoute
   '/containers/$containerId/exec': typeof ContainersContainerIdExecRoute
+  '/containers/$containerId/': typeof ContainersContainerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/containers/$containerId'
     | '/containers'
     | '/containers/$containerId/attach'
     | '/containers/$containerId/exec'
+    | '/containers/$containerId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/containers'
     | '/containers/$containerId/attach'
     | '/containers/$containerId/exec'
+    | '/containers/$containerId'
   id:
     | '__root__'
     | '/'
+    | '/containers/$containerId'
     | '/containers/'
     | '/containers/$containerId/attach'
     | '/containers/$containerId/exec'
+    | '/containers/$containerId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContainersContainerIdRouteRoute: typeof ContainersContainerIdRouteRouteWithChildren
   ContainersIndexRoute: typeof ContainersIndexRoute
-  ContainersContainerIdAttachRoute: typeof ContainersContainerIdAttachRoute
-  ContainersContainerIdExecRoute: typeof ContainersContainerIdExecRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -100,28 +123,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContainersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/containers/$containerId': {
+      id: '/containers/$containerId'
+      path: '/containers/$containerId'
+      fullPath: '/containers/$containerId'
+      preLoaderRoute: typeof ContainersContainerIdRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/containers/$containerId/': {
+      id: '/containers/$containerId/'
+      path: '/'
+      fullPath: '/containers/$containerId/'
+      preLoaderRoute: typeof ContainersContainerIdIndexRouteImport
+      parentRoute: typeof ContainersContainerIdRouteRoute
+    }
     '/containers/$containerId/exec': {
       id: '/containers/$containerId/exec'
-      path: '/containers/$containerId/exec'
+      path: '/exec'
       fullPath: '/containers/$containerId/exec'
       preLoaderRoute: typeof ContainersContainerIdExecRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ContainersContainerIdRouteRoute
     }
     '/containers/$containerId/attach': {
       id: '/containers/$containerId/attach'
-      path: '/containers/$containerId/attach'
+      path: '/attach'
       fullPath: '/containers/$containerId/attach'
       preLoaderRoute: typeof ContainersContainerIdAttachRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ContainersContainerIdRouteRoute
     }
   }
 }
 
+interface ContainersContainerIdRouteRouteChildren {
+  ContainersContainerIdAttachRoute: typeof ContainersContainerIdAttachRoute
+  ContainersContainerIdExecRoute: typeof ContainersContainerIdExecRoute
+  ContainersContainerIdIndexRoute: typeof ContainersContainerIdIndexRoute
+}
+
+const ContainersContainerIdRouteRouteChildren: ContainersContainerIdRouteRouteChildren =
+  {
+    ContainersContainerIdAttachRoute: ContainersContainerIdAttachRoute,
+    ContainersContainerIdExecRoute: ContainersContainerIdExecRoute,
+    ContainersContainerIdIndexRoute: ContainersContainerIdIndexRoute,
+  }
+
+const ContainersContainerIdRouteRouteWithChildren =
+  ContainersContainerIdRouteRoute._addFileChildren(
+    ContainersContainerIdRouteRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContainersContainerIdRouteRoute: ContainersContainerIdRouteRouteWithChildren,
   ContainersIndexRoute: ContainersIndexRoute,
-  ContainersContainerIdAttachRoute: ContainersContainerIdAttachRoute,
-  ContainersContainerIdExecRoute: ContainersContainerIdExecRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

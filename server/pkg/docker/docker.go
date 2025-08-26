@@ -39,7 +39,7 @@ func ExecContainer(appCtx context.Context, cli *client.Client, containerId strin
 		AttachStderr: true,
 		AttachStdout: true,
 		Tty:          true,
-		Cmd:          []string{"/bin/bash"},
+		Cmd:          []string{"/bin/sh"},
 	})
 	log.Println("execResponse", execResponse)
 	// startErr := cli.ContainerExecStart(appCtx, execResponse.ID, container.ExecAttachOptions{

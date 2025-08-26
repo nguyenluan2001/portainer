@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Terminal } from '@xterm/xterm'
+import { Breadcrumb, Divider } from 'antd'
 import { useEffect, useRef } from 'react'
 
 export const Route = createFileRoute('/containers/$containerId/attach')({
@@ -16,6 +17,17 @@ function RouteComponent() {
         onInitTerminal()
         onInitSocket()
     }, [])
+
+    const createBreadcrumb = () => {
+        return [
+            {
+                title: <Link to="/containers">Containers</Link>,
+            },
+            {
+                title: <Link to={`/containers/${containerId}`}>{containerId}</Link>,
+            },
+        ]
+    }
 
     const onInitTerminal = () => {
         if (terminalRef.current) return
@@ -59,7 +71,11 @@ function RouteComponent() {
     }
 
     return (
-        <div className='w-screen h-screen' id="terminal">
+        <div className='flex flex-col gap-2 h-full'>
+            <Breadcrumb items={createBreadcrumb()} />
+            <Divider className='!my-2' />
+            <div className='w-full grow h-[100px]' id="terminal">
+            </div>
         </div>
     )
 }
