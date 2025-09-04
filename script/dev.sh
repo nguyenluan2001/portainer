@@ -33,6 +33,7 @@ function run(){
     --mount type=bind,source=${PROJECT_PATH}/client,target=/app/client \
     --mount type=bind,source=${PROJECT_PATH}/.go,target=/go/pkg/mod \
     --mount type=bind,source=${PROJECT_PATH}/runtimes,target=/app/runtimes \
+    --mount type=bind,source=${PROJECT_PATH}/share,target=/app/share \
     portainer_dev_img \
     -c "/app/entrypoint.dev.sh"
 }

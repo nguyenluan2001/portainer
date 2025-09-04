@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"io"
 	"log"
 
 	"github.com/docker/docker/api/types"
@@ -33,25 +34,49 @@ func AttachContainer(appCtx context.Context, cli *client.Client, containerId str
 	})
 }
 
-func ExecContainer(appCtx context.Context, cli *client.Client, containerId string) (types.HijackedResponse, error) {
+func ExecContainer(appCtx context.Context, cli *client.Client, containerId, cmd string) (types.HijackedResponse, error) {
+	defaultCmd := "/bin/sh"
+	if cmd != "" {
+		defaultCmd = cmd
+	}
 	execResponse, _ := cli.ContainerExecCreate(appCtx, containerId, container.ExecOptions{
 		AttachStdin:  true,
 		AttachStderr: true,
 		AttachStdout: true,
 		Tty:          true,
-		Cmd:          []string{"/bin/sh"},
+		Cmd:          []string{defaultCmd},
 	})
 	log.Println("execResponse", execResponse)
-	// startErr := cli.ContainerExecStart(appCtx, execResponse.ID, container.ExecAttachOptions{
-	// 	Detach: false,
-	// 	Tty:    true,
-	// })
-	// if startErr != nil {
-	// 	log.Fatalln("Start exec process failed", startErr)
-	// }
 	return cli.ContainerExecAttach(appCtx, execResponse.ID, container.ExecAttachOptions{
 		Detach: false,
 		Tty:    true,
+	})
+}
+
+func RestartContainer(appCtx context.Context, cli *client.Client, containerId string) error {
+	return cli.ContainerRestart(appCtx, containerId, container.StopOptions{})
+}
+
+func KillContainer(appCtx context.Context, cli *client.Client, containerId string) error {
+	return cli.ContainerKill(appCtx, containerId, "SIGKILL")
+}
+
+func RemoveContainer(appCtx context.Context, cli *client.Client, containerId string) error {
+	return cli.ContainerRemove(appCtx, containerId, container.RemoveOptions{})
+}
+
+func CopyToContainer(appCtx context.Context, cli *client.Client, containerId, dstPath string, content io.Reader) error {
+	return cli.CopyToContainer(appCtx, containerId, dstPath, content, container.CopyToContainerOptions{
+		AllowOverwriteDirWithFile: true,
+	})
+}
+
+func LogContainer(appCtx context.Context, cli *client.Client, containerId string) (io.ReadCloser, error) {
+	return cli.ContainerLogs(appCtx, containerId, container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Follow:     true,
+		Timestamps: false,
 	})
 }
 

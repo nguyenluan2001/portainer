@@ -1,13 +1,12 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
+import Layout from "@/components/main/layout"
 import { getListContainerProxy } from '@/services/proxy/container'
 import type { IContainerItem } from '@/type/container'
+import { CodeIcon, Paperclip } from "@phosphor-icons/react"
 import { useQuery } from '@tanstack/react-query'
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { Button, Table, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import React from 'react'
-import { CodeIcon, Paperclip } from "@phosphor-icons/react"
-import Layout from "@/components/main/layout"
 const ContainerPage = () => {
     const { data } = useQuery({
         queryKey: ['get-list-containers'],
@@ -17,8 +16,10 @@ const ContainerPage = () => {
         {
             title: "Name",
             dataIndex: "Names",
-            render(value, record, index) {
-                return value[0].replaceAll("/", "")
+            render(value, record) {
+                const name = value[0].replaceAll("/", "")
+                const id = record.Id
+                return <Link to={`${id}`}>{name}</Link>
             },
         }, {
             title: "State",
@@ -28,7 +29,7 @@ const ContainerPage = () => {
         {
             title: "Quick action",
             dataIndex: "Id",
-            render(value, record, index) {
+            render(value, record) {
                 const isRunning = record.State === "running"
                 return (
                     <div className='flex items-center gap-2'>
@@ -57,7 +58,7 @@ const ContainerPage = () => {
         }, {
             title: "Created at",
             dataIndex: "Created",
-            render(value, record, index) {
+            render(value) {
                 return dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
             },
         }

@@ -1,0 +1,243 @@
+{
+	"workbench.iconTheme": "vscode-icons",
+	"editor.fontLigatures": true,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"liveServer.settings.donotShowInfoMsg": true,
+	"[javascript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "Wscats.qf"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"workbench.editor.wrapTabs": true,
+	"eslint.format.enable": true,
+	"files.eol": "\n",
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"eslint.alwaysShowStatus": true,
+	"cSpell.userWords": ["strapi"],
+	"vim.easymotion": true,
+	"vim.leader": "<Space>",
+	"vim.insertModeKeyBindings": [
+		{
+			"before": ["j", "j"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["<C-j>"],
+			"after": ["<Down>"]
+		},
+		{
+			"before": ["<C-h>"],
+			"after": ["<Left>"]
+		},
+		{
+			"before": ["<C-k>"],
+			"after": ["<Up>"]
+		},
+		{
+			"before": ["<C-l>"],
+			"after": ["<Right>"]
+		},
+		{
+			"before": ["<CapsLock>"],
+			"after": ["<Esc>"]
+		}
+	],
+	"vim.normalModeKeyBindings": [
+		{
+			"before": ["<Tab>"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["<CapsLock>"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["t", "o"],
+			"commands": [
+				"workbench.action.toggleSidebarVisibility",
+				"workbench.action.focusSideBar"
+			]
+		},
+		{
+			"before": ["t", "c"],
+			"commands": ["workbench.action.closeSidebar"]
+		},
+		{
+			"before": ["t", "f"],
+			"commands": ["workbench.action.focusSideBar"]
+		},
+		{
+			"before": ["g", "c"],
+			"commands": ["workbench.action.closeEditorsAndGroup"]
+		},
+		{
+			"before": ["<C-h>"],
+			"after": ["<C-w>", "h"]
+		},
+		{
+			"before": ["<C-j>"],
+			"after": ["<C-w>", "j"]
+		},
+		{
+			"before": ["<C-k>"],
+			"after": ["<C-w>", "k"]
+		},
+		{
+			"before": ["<C-l>"],
+			"after": ["<C-w>", "l"]
+		},
+		{
+			"before": ["g", "d"],
+			"commands": ["editor.action.revealDefinitionAside"]
+		},
+		{
+			"before": ["g", "j"],
+			"commands": ["editor.action.revealDefinition"]
+		},
+		{
+			"before": ["<C-Shift>", "i"],
+			"commands": ["workbench.action.increaseViewSize"]
+		},
+		{
+			"before": ["<C-Shift>", "d"],
+			"commands": ["workbench.action.decreaseViewSize"]
+		},
+		{
+			"before": ["<C-Shift>", "a"],
+			"commands": ["workbench.action.evenEditorWidths"],
+			"when": "editorTextFocus"
+		},
+		{
+			"before": ["c", "t"],
+			"commands": ["workbench.action.closeActiveEditor"]
+		},
+		{
+			"before": ["t"],
+			"after": ["g", "t"]
+		},
+		{
+			"before": ["T"],
+			"after": ["g", "T"]
+		},
+		{
+			"before": ["space", "e"],
+			"commands": ["eslint.executeAutofix"]
+		},
+		{
+			"before": ["space", "l"],
+			"commands": ["turboConsoleLog.displayLogMessage"]
+		},
+		{
+			"before": ["z", "z"],
+			"after": ["z", "a"]
+		},
+		{
+			"before": ["ff"],
+			"after": ["<Space>", "<Space>", "<Space>", "j"]
+		}
+	],
+	"vim.visualModeKeyBindings": [
+		{
+			"before": ["<Tab>"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["<CapsLock>"],
+			"after": ["<Esc>"]
+		},
+		{
+			"before": ["c", "y"],
+			"after": ["\"", "+", "y"]
+		},
+		{
+			"before": ["c", "p"],
+			"after": ["\"", "+", "p"]
+		}
+	],
+	"vim.foldfix": true,
+	"vim.showMarksInGutter": true,
+	"sync.gist": "0729713b691a3a22458b95e8d607feaf",
+	"sync.autoUpload": true,
+	"sync.autoDownload": true,
+	"sync.forceDownload": true,
+	"sync.forceUpload": true,
+	"sync.quietSync": true,
+	"vim.handleKeys": {
+		"<C-d>": true,
+		"<C-s>": false,
+		"<C-z>": false
+	},
+	"sonarlint.rules": {
+		"typescript:S6480": {
+			"level": "off"
+		},
+		"javascript:S6480": {
+			"level": "off"
+		}
+	},
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"[python]": {
+		"editor.formatOnType": true
+	},
+	"turboConsoleLog.delimiterInsideMessage": "=====",
+	"turboConsoleLog.addSemicolonInTheEnd": true,
+	"turboConsoleLog.includeFileNameAndLineNum": false,
+	"javascript.suggest.names": false,
+	"js/ts.implicitProjectConfig.checkJs": true,
+	"javascript.validate.enable": false,
+	"settingsSync.ignoredExtensions": [],
+	"syncSettings.resources": [
+		"extensions",
+		"keybindings",
+		"settings",
+		"snippets",
+		"uiState"
+	],
+	"syncSettings.additionalFiles": [
+		"extensions",
+		"keybindings",
+		"settings",
+		"snippets",
+		"uiState"
+	],
+	"bracket-pair-colorizer-2.depreciation-notice": false,
+	"sonarlint.connectedMode.connections.sonarcloud": [
+		{
+			"organizationKey": "smartr-new",
+			"connectionId": "smartr-new"
+		}
+	],
+	"sonarlint.pathToNodeExecutable": "/home/luannguyen/.nvm/versions/node/v18.19.0/bin/node",
+	"aws.suppressPrompts": {
+		"codeWhispererConnectionExpired": true,
+		"codeWhispererNewWelcomeMessage": true
+	},
+	"workbench.editor.empty.hint": "hidden",
+	"prisma.showPrismaDataPlatformNotification": false,
+	"turboConsoleLog.quote": "'",
+	"workbench.colorTheme": "Dracula Theme",
+	"remote.portsAttributes": {
+		"5555": {
+			"protocol": "http"
+		}
+	},
+	"editor.formatOnSave": true,
+	"prettier.eslintIntegration": true,
+	"go.alternateTools": {},
+	"go.toolsManagement.autoUpdate": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"[go]": {
+		"editor.defaultFormatter": "golang.go"
+	},
+	"biome.configurationPath": "./client/biome.json",
+	"biome.lsp.bin": "./client/node_modules/@biomejs/biome/bin/biome",
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
+}

@@ -25,6 +25,12 @@ func InitRouter(app *app.App) {
 	})
 	apiRouter.Get("/containers", app.GetContainers)
 	apiRouter.Get("/containers/:containerId", app.GetContainerDetail)
+	apiRouter.Get("/container/detail/:containerId", app.GetContainerDetail)
+	apiRouter.Get("/container/kill/:containerId", app.KillContainer)
+	apiRouter.Get("/container/restart/:containerId", app.RestartContainer)
+	apiRouter.Get("/container/remove/:containerId", app.RemoveContainer)
+	apiRouter.Post("/container/copy/:containerId", app.CopyHostToContainer)
+	apiRouter.Get("/container/log/:containerId", app.LogContainer)
 
 	// WebSocket route handler
 	socketRouter := router.Group(config.API_SOCKET_PREFIX_PATH)

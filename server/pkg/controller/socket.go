@@ -44,12 +44,29 @@ func (app *App) ExecContainer() func(*fiber.Ctx) error {
 		query := kws.Query
 		log.Println("quries", query("containerId"))
 		kws.SetAttribute("containerId", query("containerId"))
+		kws.SetAttribute("cmd", query("cmd"))
 		kws.SetAttribute("exec", query("attach"))
 	})
 }
 
 func (app *App) SocketListener() {
 	log.Println("Socket")
+
+	socketio.On(socketio.EventConnect, func(ep *socketio.EventPayload) {
+		socketio.EmitTo(ep.Kws.GetUUID(), []byte("CONNECTED"))
+	})
+	socketio.On(socketio.EventDisconnect, func(ep *socketio.EventPayload) {
+		containerId := fmt.Sprintf("%v", ep.Kws.GetAttribute("containerId"))
+		containerAction := fmt.Sprintf("%v", ep.Kws.GetAttribute("action"))
+		key := fmt.Sprintf("%s_%s", containerId, containerAction)
+		hijacked, ok := app.HijackedPool[key]
+		if ok {
+			hijacked.Close()
+			delete(app.HijackedPool, key)
+			log.Println("Hijacked closed and deleted from pool")
+		}
+		log.Println("Socket disconnected")
+	})
 
 	socketio.On(socketio.EventMessage, func(ep *socketio.EventPayload) {
 		containerId := fmt.Sprintf("%v", ep.Kws.GetAttribute("containerId"))
@@ -70,7 +87,9 @@ func (app *App) SocketListener() {
 		} else if string(ep.Data) == "START_EXEC" {
 			log.Println("=== START_EXEC ===")
 			log.Println("containerId", containerId)
-			hijacked, _ := docker.ExecContainer(app.AppCtx, app.DockerCLI, containerId)
+
+			cmd := fmt.Sprintf("%v", ep.Kws.GetAttribute("cmd"))
+			hijacked, _ := docker.ExecContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
 			app.HijackedPool[key] = hijacked
 			go func(hijacked types.HijackedResponse) {
 				io.Copy(&socketWriter{ep}, hijacked.Reader)
