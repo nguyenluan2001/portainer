@@ -14,11 +14,7 @@ export const Route = createFileRoute("/containers/$containerId/")({
 
 function RouteComponent() {
 	const { containerId } = Route.useParams();
-	const {
-		data: containerDetail,
-		isLoading,
-		isFetching,
-	} = useQuery({
+	const { data: containerDetail } = useQuery({
 		queryKey: ["container", containerId],
 		queryFn: async () => getContainerDetailProxy(containerId),
 		enabled: !!containerId,
@@ -28,7 +24,7 @@ function RouteComponent() {
 	return (
 		<div className="w-full h-full max-h-full overflow-hidden flex flex-col">
 			<Toolbar name={"Container name"} containerId={containerId} />
-			<div className="w-full h-full flex">
+			<div className="w-full flex grow max-h-full overflow-hidden">
 				<Sidebar />
 				<div className="grow w-[100px] p-3 flex flex-col gap-3 max-h-full h-full overflow-y-auto">
 					<Overview containerDetail={containerDetail!} />

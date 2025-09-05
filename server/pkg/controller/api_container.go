@@ -1,9 +1,9 @@
 package app
 
 import (
+	"bufio"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nguyenluan2001/portainer/server/pkg/docker"
@@ -159,18 +159,42 @@ func (app *App) LogContainer(ctx *fiber.Ctx) error {
 
 	// }(app.AppCtx, app.DockerCLI, ctx, containerId)
 
-	ctx.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *fasthttp.Writer) {
+	ctx.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
 		for {
 			// Format the SSE message
-			eventData := fmt.Sprintf("data: The current time is %s\n\n", time.Now().Format(time.RFC1123Z))
-			_, err := w.WriteString(eventData)
-			if err != nil {
-				log.Println("Error writing to stream:", err)
-				return // Exit on error (e.g., client disconnected)
-			}
-			w.Flush() // Ensure data is sent immediately
+			// eventData := fmt.Sprintf("data: The current time is %s\n\n", time.Now().Format(time.RFC1123Z))
+			// _, err := w.WriteString(eventData)
+			// if err != nil {
+			// 	log.Println("Error writing to stream:", err)
+			// 	return // Exit on error (e.g., client disconnected)
+			// }
+			// w.Flush() // Ensure data is sent immediately
 
-			time.Sleep(2 * time.Second) // Send an event every 2 seconds
+			// time.Sleep(2 * time.Second) // Send an event every 2 seconds
+
+			ioReader, err := docker.LogContainer(app.AppCtx, app.DockerCLI, containerId)
+			if err != nil {
+				app.ErrorLogger.Println("Log the container detail failed.", err)
+				return
+			}
+			reader := bufio.NewReader(ioReader)
+			// io.Copy(w, reader)
+			previousLine := ""
+			for {
+				line, err := reader.ReadString('\n')
+				log.Println("line", line)
+				if err != nil {
+					log.Println("Error reading from container logs:", err)
+					break
+				}
+				if line == previousLine {
+					continue
+				}
+				previousLine = line
+				eventData := fmt.Sprintf("data: %s\n\n", line)
+				w.WriteString(eventData)
+				w.Flush() // Ensure data is sent immediately
+			}
 		}
 	}))
 	return nil
