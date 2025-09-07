@@ -16,7 +16,13 @@ declare global {
 	}
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			refetchOnWindowFocus: false, // default: true
+		},
+	},
+});
 const router = createRouter({
 	routeTree,
 });
@@ -52,9 +58,19 @@ createRoot(document.getElementById("root")!).render(
 						// 	// defaultHoverColor: "var(--text-primary)",
 						// },
 						Popover: {
-							colorBgContainer: "var(--bg-primary)",
-							colorBgElevated: "var(--bg-primary)",
+							colorBgContainer: "var(--popover-bg)",
+							colorBgElevated: "var(--popover-bg)",
 							colorBorder: "var(--bg-secondary)",
+							colorText: "var(--card-foreground)",
+							colorTextHeading: "var(--bar-foreground)",
+							colorTextBase: "var(--bar-foreground)",
+						},
+						Popconfirm: {
+							colorBgContainer: "var(--popover-bg)",
+							colorBgElevated: "var(--popover-bg)",
+							colorText: "var(--card-foreground)",
+							colorTextHeading: "var(--bar-foreground)",
+							colorTextBase: "var(--bar-foreground)",
 						},
 						Segmented: {
 							trackBg: "var(--bg-secondary)",
@@ -72,9 +88,14 @@ createRoot(document.getElementById("root")!).render(
 							colorBgContainer: "var(--card)",
 							colorText: "var(--card-foreground)",
 							borderColor: "var(--border)",
-							rowHoverBg: "var(--muted)",
 							headerBg: "var(--card)",
 							headerColor: "var(--card-foreground)",
+							rowSelectedBg: "var(--row-selected-bg)",
+							rowSelectedHoverBg: "var(--row-selected-bg)",
+							rowHoverBg: "var(--row-selected-bg)",
+							headerSortHoverBg: "var(--row-selected-bg)",
+							bodySortBg: "var(--row-selected-bg)",
+							headerSortActiveBg: "var(--row-selected-bg)",
 						},
 						Breadcrumb: {
 							itemColor: "var(--foreground)",

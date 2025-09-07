@@ -3,6 +3,17 @@
 PROJECT_PATH=$(pwd)
 PROJECT_NAME=portainer
 
+function init() {
+  package_path="/app/runtimes/packages"
+  if [[ ! -e $package_path ]]; then
+    mkdir $package_path
+  fi
+  
+  cp $(which tree) $package_path/tree
+}
+
+init
+
 # Check if the session is interactive
 if [ -t 0 ]; then
   # Start a new detached tmux session if one doesn't exist
@@ -31,7 +42,6 @@ else
   # If not interactive, just run the default command
   exec "$@"
 fi
-
 
 
 # # === Start client ===

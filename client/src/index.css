@@ -33,6 +33,9 @@
 		--sidebar-accent-foreground: oklch(98.5% 0 0);
 		--sidebar-border: oklch(100% 0 0 / 0.1);
 		--sidebar-ring: oklch(54.1% 0.281 293.009);
+
+		--row-selected-bg: color-mix(in oklab, var(--muted) 90%, transparent);
+		--popover-bg: color-mix(in oklab, var(--muted) 100%, transparent);
 	}
 
 	html[data-theme="light"] {
@@ -133,6 +136,11 @@
 	}
 	.ant-anchor-ink {
 		display: none !important;
+	}
+}
+.ant-table {
+	.ant-table-column-sorter {
+		color: var(--card-foreground) !important;
 	}
 }
 * {

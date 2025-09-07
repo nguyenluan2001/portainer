@@ -44,7 +44,9 @@ func main() {
 		DockerCLI: dockerCLI,
 		AppCtx:    appCtx,
 		PathConfig: model.AppPathConfig{
-			ProjectPath: projectPath,
+			ProjectPath:    projectPath,
+			RuntimesPath:   path.Join(projectPath, "runtimes"),
+			BinaryTreePath: "/usr/bin/tree",
 		},
 		AppLogger:    appLogger,
 		HijackedPool: map[string]types.HijackedResponse{},

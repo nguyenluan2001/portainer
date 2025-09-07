@@ -17,8 +17,12 @@
 		"rules": {
 			"recommended": true,
 			"correctness": "warn",
-			"suspicious":{
-				"noExplicitAny":"warn"
+			"suspicious": {
+				"noExplicitAny": "warn"
+			},
+			"a11y": {
+				"useValidAnchor": "off",
+				"noStaticElementInteractions": "off"
 			}
 		}
 	},

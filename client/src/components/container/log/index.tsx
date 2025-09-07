@@ -4,27 +4,33 @@ import { useEffect, useId, useRef, useState, type FC } from "react";
 import { Terminal } from "@xterm/xterm";
 import classNames from "classnames";
 import { LazyLog } from "@melloware/react-logviewer";
+import { decode, encode } from "html-entities";
 
 interface Props {
 	containerId: string;
 }
+
 const LogContainer: FC<Props> = ({ containerId }) => {
-	const [isConnected, setIsConnected] = useState(false);
-	const terminalRef = useRef<Terminal>(null);
 	const eventSourceRef = useRef<EventSource | null>(null);
 	const logRef = useRef<LazyLog | null>(null);
-	const terminalId = useId();
 
 	const onInitSSE = () => {
+		console.log("onInitSSE");
+		return;
 		if (eventSourceRef.current) return;
 		const path =
 			window.API_URL?.replace(/\/+$/, "") + `/api/container/log/${containerId}`;
+		console.log("path");
 		eventSourceRef.current = new EventSource(path);
 		eventSourceRef.current.onmessage = function (event) {
-			setIsConnected(true);
-			if (event?.data?.length === 0) return;
 			console.log("New message", event.data);
-			logRef.current?.appendLines([event.data]);
+			if (event?.data?.length === 0) return eventSourceRef.current?.close();
+			console.log("New message", event.data);
+			logRef.current?.appendLines([
+				decode(event.data, {
+					level: "html5",
+				}),
+			]);
 		};
 	};
 
@@ -36,7 +42,7 @@ const LogContainer: FC<Props> = ({ containerId }) => {
 		enableGutters: false,
 		enableHotKeys: true,
 		enableLineNumbers: true,
-		enableLinks: false,
+		enableLinks: true,
 		wrapLines: false,
 		enableMultilineHighlight: true,
 		enableSearch: true,
@@ -51,6 +57,8 @@ const LogContainer: FC<Props> = ({ containerId }) => {
 		selectableLines: true,
 		width: "auto",
 		external: true,
+		follow: true,
+		text: "",
 	};
 	return (
 		<ContainerCard

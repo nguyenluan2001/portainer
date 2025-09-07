@@ -19,7 +19,10 @@ func InitRouter(app *app.App) {
 	})
 
 	apiRouter := router.Group(config.API_PREFIX_PATH)
-	apiRouter.Use(cors.New())
+	apiRouter.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowMethods: "*",
+	}))
 	apiRouter.Get("/check", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("Server on")
 	})
@@ -31,6 +34,11 @@ func InitRouter(app *app.App) {
 	apiRouter.Get("/container/remove/:containerId", app.RemoveContainer)
 	apiRouter.Post("/container/copy/:containerId", app.CopyHostToContainer)
 	apiRouter.Get("/container/log/:containerId", app.LogContainer)
+	apiRouter.Get("/container/filesystem/:containerId", app.GetFilesystemContainer)
+	apiRouter.Post("/container/upload/:containerId", app.UploadToContainer)
+	apiRouter.Get("/container/download/:containerId", app.DownloadFromContainer)
+	apiRouter.Post("/container/remove-endpoints/:containerId", app.RemoveEndpointsContainer)
+	apiRouter.Post("/container/fs/add-folder/:containerId", app.AddFolderContainer)
 
 	// WebSocket route handler
 	socketRouter := router.Group(config.API_SOCKET_PREFIX_PATH)

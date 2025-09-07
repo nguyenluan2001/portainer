@@ -2,12 +2,14 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/nguyenluan2001/portainer/server/pkg/utils"
 )
 
 func CreateDockerClient() (*client.Client, error) {
@@ -53,6 +55,51 @@ func ExecContainer(appCtx context.Context, cli *client.Client, containerId, cmd 
 	})
 }
 
+func GetFilesystemContainer(appCtx context.Context, cli *client.Client, containerId, binaryPath, path string) (types.HijackedResponse, error) {
+	// option := `--timefmt "%H:%M:%S %d/%m/%Y" -pasDuJ -L 1 --noreport --dirsfirst `
+	option := `--timefmt "%s" -pasDuJ -L 1 --noreport --dirsfirst `
+	cmd := fmt.Sprintf(`%s %s  %s`, binaryPath, option, path)
+	log.Println("GetFilesystemContainer", cmd)
+	execResponse, _ := cli.ContainerExecCreate(appCtx, containerId, container.ExecOptions{
+		AttachStderr: true,
+		AttachStdout: true,
+		Tty:          true,
+		Cmd:          []string{"sh", "-c", cmd},
+	})
+	return cli.ContainerExecAttach(appCtx, execResponse.ID, container.ExecAttachOptions{
+		Detach: false,
+		Tty:    true,
+	})
+}
+
+func RemoveEndpointsContainer(appCtx context.Context, cli *client.Client, containerId string, endpoints []string) (types.HijackedResponse, error) {
+	script := utils.GenerateRemoveEndpointsScript(endpoints)
+	cmd := fmt.Sprintf("echo '%s' > remove.sh && sh remove.sh && rm remove.sh", script)
+	execResponse, _ := cli.ContainerExecCreate(appCtx, containerId, container.ExecOptions{
+		AttachStderr: true,
+		AttachStdout: true,
+		Tty:          true,
+		Cmd:          []string{"sh", "-c", cmd},
+	})
+	return cli.ContainerExecAttach(appCtx, execResponse.ID, container.ExecAttachOptions{
+		Detach: false,
+		Tty:    true,
+	})
+}
+
+func FsManageContainer(appCtx context.Context, cli *client.Client, containerId string, cmd string) (types.HijackedResponse, error) {
+	execResponse, _ := cli.ContainerExecCreate(appCtx, containerId, container.ExecOptions{
+		AttachStderr: true,
+		AttachStdout: true,
+		Tty:          true,
+		Cmd:          []string{"sh", "-c", cmd},
+	})
+	return cli.ContainerExecAttach(appCtx, execResponse.ID, container.ExecAttachOptions{
+		Detach: false,
+		Tty:    true,
+	})
+}
+
 func RestartContainer(appCtx context.Context, cli *client.Client, containerId string) error {
 	return cli.ContainerRestart(appCtx, containerId, container.StopOptions{})
 }
@@ -71,12 +118,16 @@ func CopyToContainer(appCtx context.Context, cli *client.Client, containerId, ds
 	})
 }
 
+func CopyFromContainer(appCtx context.Context, cli *client.Client, containerId, srcPath string) (io.ReadCloser, container.PathStat, error) {
+	return cli.CopyFromContainer(appCtx, containerId, srcPath)
+}
+
 func LogContainer(appCtx context.Context, cli *client.Client, containerId string) (io.ReadCloser, error) {
 	return cli.ContainerLogs(appCtx, containerId, container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 		Follow:     true,
-		Timestamps: false,
+		Details:    true,
 	})
 }
 

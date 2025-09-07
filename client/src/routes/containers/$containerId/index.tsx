@@ -1,3 +1,4 @@
+import FileSharing from "@/components/container/file-sharing";
 import LogContainer from "@/components/container/log";
 import Overview from "@/components/container/overview";
 import Sidebar from "@/components/container/sidebar";
@@ -30,6 +31,7 @@ function RouteComponent() {
 					<Overview containerDetail={containerDetail!} />
 					<Terminal />
 					<LogContainer containerId={containerId} />
+					<FileSharing containerId={containerId} />
 				</div>
 			</div>
 		</div>

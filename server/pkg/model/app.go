@@ -3,7 +3,9 @@ package model
 import "log"
 
 type AppPathConfig struct {
-	ProjectPath string
+	ProjectPath    string
+	RuntimesPath   string
+	BinaryTreePath string
 }
 
 type AppLogger struct {

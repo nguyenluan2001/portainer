@@ -1,5 +1,7 @@
 .go
 client/node_modules
 client/.tanstack
-runtimes/*.log
+runtimes
+runtimes/*/*
+runtimes/app.log
 *.log

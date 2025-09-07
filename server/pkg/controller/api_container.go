@@ -1,10 +1,16 @@
 package app
 
 import (
+	"archive/tar"
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"path"
 
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nguyenluan2001/portainer/server/pkg/docker"
 	"github.com/nguyenluan2001/portainer/server/pkg/model"
@@ -108,8 +114,8 @@ func (app *App) RemoveContainer(ctx *fiber.Ctx) error {
 func (app *App) CopyHostToContainer(ctx *fiber.Ctx) error {
 	containerId := ctx.Params("containerId")
 
-	path := "/app/share/test.sh"
-	destPath := "/"
+	path := "/app/runtimes/packages/tree"
+	destPath := "/usr/bin"
 	archive, _ := utils.CreateTarArchive(path)
 	err := docker.CopyToContainer(app.AppCtx, app.DockerCLI, containerId, destPath, archive)
 
@@ -129,6 +135,90 @@ func (app *App) CopyHostToContainer(ctx *fiber.Ctx) error {
 	})
 }
 
+func (app *App) UploadToContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	file, _ := ctx.FormFile("file")
+	dstPath := ctx.Query("dstPath")
+	filePath := path.Join(app.PathConfig.RuntimesPath, "upload", file.Filename)
+	ctx.SaveFile(file, filePath)
+
+	archive, _ := utils.CreateTarArchive(filePath)
+	err := docker.CopyToContainer(app.AppCtx, app.DockerCLI, containerId, dstPath, archive)
+
+	if err != nil {
+		app.ErrorLogger.Println("Copy to container detail failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Copy to container detail failed.",
+			Message:      nil,
+		})
+	}
+
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      "Copy to container successfully",
+	})
+}
+
+func (app *App) DownloadFromContainer(ctx *fiber.Ctx) error {
+	log.Println("DownloadFromContainer")
+	containerId := ctx.Params("containerId")
+	srcPath := ctx.Query("srcPath")
+	ioReader, pathStat, err := docker.CopyFromContainer(app.AppCtx, app.DockerCLI, containerId, srcPath)
+
+	if err != nil {
+		app.ErrorLogger.Println("Copy from container failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Copy from container failed.",
+			Message:      nil,
+		})
+	}
+
+	fileName := pathStat.Name
+	attachment := fmt.Sprintf("attachment; filename=%s", fileName)
+	ctx.Set("Content-Disposition", attachment)
+
+	tarReader := tar.NewReader(ioReader)
+
+	// Extract the file from the tar archive
+	_, extractErr := tarReader.Next()
+
+	if extractErr != nil {
+		app.ErrorLogger.Println("Extract file from container failed", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Extract file from container failed",
+			Message:      nil,
+		})
+	}
+	return ctx.SendStream(tarReader)
+}
+
+type sseWriter struct {
+	w *bufio.Writer
+}
+
+func (sw *sseWriter) Write(p []byte) (n int, err error) {
+	// Write the SSE 'data' prefix and a newline
+	if _, err := sw.w.Write([]byte("data: ")); err != nil {
+		return 0, err
+	}
+	// Write the actual log message
+	if _, err := sw.w.Write(p); err != nil {
+		return 0, err
+	}
+	// Write two newlines to mark the end of the SSE event
+	if _, err := sw.w.Write([]byte("\n\n")); err != nil {
+		return 0, err
+	}
+
+	// Use http.Flusher to send the data immediately
+	sw.w.Flush()
+
+	return len(p), nil
+}
 func (app *App) LogContainer(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "text/event-stream")
 	ctx.Set("Cache-Control", "no-cache")
@@ -138,70 +228,157 @@ func (app *App) LogContainer(ctx *fiber.Ctx) error {
 	containerId := ctx.Params("containerId")
 	log.Println("containerId", containerId)
 
-	// go func(appCtx context.Context, dockerCli *client.Client, ctx *fiber.Ctx, containerId string) {
-	// 	ioReader, err := docker.LogContainer(app.AppCtx, app.DockerCLI, containerId)
-
-	// 	if err != nil {
-	// 		app.ErrorLogger.Println("Log the container detail failed.", err)
-	// 	}
-
-	// 	reader := bufio.NewReader(ioReader)
-
-	// 	for {
-	// 		line, err := reader.ReadString('\n')
-	// 		log.Println("line", line)
-	// 		if err != nil {
-	// 			log.Println("Error reading from container logs:", err)
-	// 			break
-	// 		}
-	// 		ctx.SendStream(reader)
-	// 	}
-
-	// }(app.AppCtx, app.DockerCLI, ctx, containerId)
-
 	ctx.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
 		for {
-			// Format the SSE message
-			// eventData := fmt.Sprintf("data: The current time is %s\n\n", time.Now().Format(time.RFC1123Z))
-			// _, err := w.WriteString(eventData)
-			// if err != nil {
-			// 	log.Println("Error writing to stream:", err)
-			// 	return // Exit on error (e.g., client disconnected)
-			// }
-			// w.Flush() // Ensure data is sent immediately
-
-			// time.Sleep(2 * time.Second) // Send an event every 2 seconds
-
 			ioReader, err := docker.LogContainer(app.AppCtx, app.DockerCLI, containerId)
 			if err != nil {
 				app.ErrorLogger.Println("Log the container detail failed.", err)
 				return
 			}
+			writer := &sseWriter{w}
+
 			reader := bufio.NewReader(ioReader)
-			// io.Copy(w, reader)
-			previousLine := ""
-			for {
-				line, err := reader.ReadString('\n')
-				log.Println("line", line)
-				if err != nil {
-					log.Println("Error reading from container logs:", err)
-					break
-				}
-				if line == previousLine {
-					continue
-				}
-				previousLine = line
-				eventData := fmt.Sprintf("data: %s\n\n", line)
-				w.WriteString(eventData)
-				w.Flush() // Ensure data is sent immediately
+			_, err = stdcopy.StdCopy(writer, writer, reader)
+			if err != nil {
+				app.ErrorLogger.Println("Copy log to writer failed.", err)
+				return
 			}
+			ioReader.Close()
 		}
 	}))
 	return nil
+}
+
+func (app *App) GetFilesystemContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	path := ctx.Query("path", "/")
+	log.Println("containerId", containerId)
+	log.Println("path", path)
+
+	//Copy binary file of tree to container
+	srcPath := app.PathConfig.BinaryTreePath
+	destPath := "/usr/bin"
+	binaryPath := fmt.Sprintf("%s/tree", destPath)
+	archive, _ := utils.CreateTarArchive(srcPath)
+	err := docker.CopyToContainer(app.AppCtx, app.DockerCLI, containerId, destPath, archive)
+
+	if err != nil {
+		app.ErrorLogger.Println("Copy to container detail failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Copy to container detail failed.",
+			Message:      nil,
+		})
+	}
+
+	// Get filesystem
+	hijacked, err := docker.GetFilesystemContainer(app.AppCtx, app.DockerCLI, containerId, binaryPath, path)
+
+	if err != nil {
+		app.ErrorLogger.Println("Exec the container detail failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Exec the container detail failed.",
+			Message:      nil,
+		})
+	}
+
+	// Get response from hijacked
+	var stdout bytes.Buffer
+	stdoutWriter := bufio.NewWriter(&stdout)
+	io.Copy(stdoutWriter, hijacked.Reader)
+	if err != nil {
+		log.Fatalf("Failed to copy output: %v", err)
+	}
+	stdoutWriter.Flush()
+	var filesystem []model.Filesystem
+	var filesystemResp model.Filesystem
+	json.Unmarshal([]byte(stdout.Bytes()), &filesystem)
+	defer hijacked.Close()
+
+	if len(filesystem) > 0 {
+		filesystemResp = filesystem[0]
+	}
 
 	return ctx.JSON(model.ApiContent{
 		Status:       0,
 		ErrorMessage: "",
-		Message:      "Logs to container successfully",
+		Message:      filesystemResp,
+	})
+}
+
+func (app *App) RemoveEndpointsContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	var requestParams = new(model.RemoveEndpointsRequest)
+
+	if err := ctx.BodyParser(requestParams); err != nil {
+		app.AppLogger.ErrorLogger.Println("BodyParser failed: ", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Remove endpoints failed.",
+			Message:      nil,
+		})
+	}
+
+	log.Println("requestParams", requestParams)
+	cmd := utils.GenerateRemoveEndpointsScript(requestParams.Endpoints)
+	// hijacked, err := docker.RemoveEndpointsContainer(app.AppCtx, app.DockerCLI, containerId, requestParams.Endpoints)
+	hijacked, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
+
+	var buff bytes.Buffer
+
+	writer := bufio.NewWriter(&buff)
+
+	io.Copy(writer, hijacked.Reader)
+	writer.Flush()
+
+	line, _ := buff.ReadString('\n')
+
+	log.Println("hijacked response", line)
+
+	if err != nil {
+		app.ErrorLogger.Println("Remove endpoints failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Remove endpoints failed.",
+			Message:      nil,
+		})
+	}
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      "Remove endpoints failed.",
+	})
+}
+
+func (app *App) AddFolderContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	// endpoints := ctx.FormValue("endpoints")
+	var requestParams = new(model.AddFolderRequest)
+
+	if err := ctx.BodyParser(requestParams); err != nil {
+		app.AppLogger.ErrorLogger.Println("BodyParser failed: ", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Add folder failed.",
+			Message:      nil,
+		})
+	}
+
+	log.Println("requestParams", requestParams)
+	cmd := utils.AddFolderScript(requestParams.DstPath, requestParams.Name)
+	_, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
+	if err != nil {
+		app.ErrorLogger.Println("Add folder failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Add folder failed.",
+			Message:      nil,
+		})
+	}
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      "Add folder failed.",
 	})
 }

@@ -15,3 +15,12 @@ type GetContainerResponse struct {
 type GetContainerDetailResponse struct {
 	container.InspectResponse
 }
+
+type RemoveEndpointsRequest struct {
+	Endpoints []string `json:"endpoints" form:"endpoints"`
+}
+
+type AddFolderRequest struct {
+	Name    string `json:"name" form:"name"`
+	DstPath string `json:"dstPath" form:"dstPath"`
+}
