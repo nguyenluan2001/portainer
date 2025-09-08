@@ -41,6 +41,7 @@ const Overview: FC<Props> = ({ containerDetail }) => {
 			}
 		>
 			<Table
+				bordered
 				dataSource={dataSource}
 				columns={columns}
 				pagination={false}

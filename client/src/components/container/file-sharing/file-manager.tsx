@@ -21,6 +21,7 @@ import {
 	FolderSimplePlusIcon,
 	HouseIcon,
 	HouseSimpleIcon,
+	PencilSimpleLineIcon,
 	TrashIcon,
 	UploadSimpleIcon,
 } from "@phosphor-icons/react";
@@ -43,6 +44,8 @@ import { useMemo, useState, type FC, type Key } from "react";
 import { toast } from "react-toastify";
 import ModalAddFolder from "./add-folder";
 import dayjs from "dayjs";
+import FileEditor from "./file-editor";
+import { useQueryKeysFactory } from "@/hooks/react-query/useQueryKeysFactory";
 
 interface Props {
 	containerId: string;
@@ -63,12 +66,15 @@ const FileManager: FC<Props> = ({ containerId }) => {
 	const [openModalAddFolder, setOpenModalAddFolder] = useState(false);
 
 	const queryClient = useQueryClient();
+	const {
+		containerKeys: { getFilesystem },
+	} = useQueryKeysFactory();
 	const { data, isLoading, isFetching } = useQuery<
 		unknown,
 		unknown,
 		IFilesystem
 	>({
-		queryKey: ["filesystem", containerId, path],
+		queryKey: getFilesystem(containerId, path),
 		queryFn: () => getContainerFsProxy(containerId, path),
 		enabled: !!containerId,
 		staleTime: Infinity,
@@ -89,7 +95,7 @@ const FileManager: FC<Props> = ({ containerId }) => {
 
 	const onRefresh = () => {
 		queryClient.invalidateQueries({
-			queryKey: ["filesystem", containerId, path],
+			queryKey: getFilesystem(containerId, path),
 		});
 	};
 
@@ -252,6 +258,13 @@ const FileManager: FC<Props> = ({ containerId }) => {
 				const isDirectory = record.type === "directory";
 				return (
 					<div className="flex items-center gap-[8px]">
+						{!isDirectory && (
+							<FileEditor
+								title="Edit file"
+								containerId={containerId}
+								file={record}
+							/>
+						)}
 						{!isDirectory && (
 							<Button
 								size="small"

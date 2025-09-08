@@ -39,6 +39,9 @@ func InitRouter(app *app.App) {
 	apiRouter.Get("/container/download/:containerId", app.DownloadFromContainer)
 	apiRouter.Post("/container/remove-endpoints/:containerId", app.RemoveEndpointsContainer)
 	apiRouter.Post("/container/fs/add-folder/:containerId", app.AddFolderContainer)
+	apiRouter.Post("/container/fs/add-folder/:containerId", app.AddFolderContainer)
+	apiRouter.Get("/container/fs/get-file/:containerId", app.GetFileContentContainer)
+	apiRouter.Post("/container/fs/update-file/:containerId", app.UpdateFileContainer)
 
 	// WebSocket route handler
 	socketRouter := router.Group(config.API_SOCKET_PREFIX_PATH)

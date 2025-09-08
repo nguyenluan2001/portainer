@@ -34,3 +34,10 @@ func AddFolderScript(dstPath, name string) string {
 	`, path.Join(dstPath, name))
 	return script
 }
+
+func GetFileContentScript(path string) string {
+	script := fmt.Sprintf(`
+	cat "%s"
+	`, path)
+	return script
+}

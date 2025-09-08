@@ -4,11 +4,13 @@ import {
 	ADD_FOLER_PATH,
 	GET_CONTAINER_DETAIL_PATH,
 	GET_CONTAINER_FS_PATH,
+	GET_FILE_CONTENT_PATH,
 	GET_LIST_CONTAINER_PATH,
 	KILL_CONTAINER_PATH,
 	REMOVE_CONTAINER_PATH,
 	REMOVE_ENDPOINTS_PATH,
 	RESTART_CONTAINER_PATH,
+	UPDATE_FILE_PATH,
 	UPLOAD_TO_CONTAINER_PATH,
 } from "@/constant/router";
 
@@ -69,5 +71,29 @@ export const addFolderApi = (
 	return apiInstance.post(join(ADD_FOLER_PATH, containerId), {
 		dstPath,
 		name,
+	});
+};
+
+export const getFileContentApi = (containerId: string, path: string) => {
+	return apiInstance.get(join(GET_FILE_CONTENT_PATH, containerId), {
+		params: { path },
+	});
+};
+
+export const updateFileApi = ({
+	containerId,
+	oldPath,
+	newPath,
+	content,
+}: {
+	containerId: string;
+	oldPath: string;
+	newPath: string;
+	content: string;
+}) => {
+	return apiInstance.post(join(UPDATE_FILE_PATH, containerId), {
+		oldPath,
+		newPath,
+		content,
 	});
 };

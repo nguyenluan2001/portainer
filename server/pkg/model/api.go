@@ -24,3 +24,9 @@ type AddFolderRequest struct {
 	Name    string `json:"name" form:"name"`
 	DstPath string `json:"dstPath" form:"dstPath"`
 }
+
+type UpdateFileRequest struct {
+	OldPath string `json:"oldPath" form:"oldPath"`
+	NewPath string `json:"newPath" form:"newPath"`
+	Content string `json:"content" form:"content"`
+}

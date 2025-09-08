@@ -8,3 +8,5 @@ export const UPLOAD_TO_CONTAINER_PATH = "/api/container/upload";
 export const DOWNLOAD_FROM_CONTAINER_PATH = "/api/container/download";
 export const REMOVE_ENDPOINTS_PATH = "/api/container/remove-endpoints";
 export const ADD_FOLER_PATH = "/api/container/fs/add-folder";
+export const GET_FILE_CONTENT_PATH = "/api/container/fs/get-file";
+export const UPDATE_FILE_PATH = "/api/container/fs/update-file";

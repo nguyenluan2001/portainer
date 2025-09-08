@@ -353,7 +353,6 @@ func (app *App) RemoveEndpointsContainer(ctx *fiber.Ctx) error {
 
 func (app *App) AddFolderContainer(ctx *fiber.Ctx) error {
 	containerId := ctx.Params("containerId")
-	// endpoints := ctx.FormValue("endpoints")
 	var requestParams = new(model.AddFolderRequest)
 
 	if err := ctx.BodyParser(requestParams); err != nil {
@@ -380,5 +379,72 @@ func (app *App) AddFolderContainer(ctx *fiber.Ctx) error {
 		Status:       0,
 		ErrorMessage: "",
 		Message:      "Add folder failed.",
+	})
+}
+
+func (app *App) GetFileContentContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	path := ctx.Query("path")
+
+	cmd := utils.GetFileContentScript(path)
+	hijacked, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
+
+	var buff bytes.Buffer
+	writer := bufio.NewWriter(&buff)
+
+	io.Copy(writer, hijacked.Reader)
+	writer.Flush()
+
+	defer hijacked.Close()
+	if err != nil {
+		app.ErrorLogger.Println("Get file content failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Get file content failed.",
+			Message:      nil,
+		})
+	}
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      buff.String(),
+	})
+}
+
+func (app *App) UpdateFileContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	var requestParams = new(model.UpdateFileRequest)
+
+	if err := ctx.BodyParser(requestParams); err != nil {
+		app.AppLogger.ErrorLogger.Println("BodyParser failed: ", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Update file failed.",
+			Message:      nil,
+		})
+	}
+
+	cmd := ""
+
+	if requestParams.OldPath == requestParams.NewPath {
+		cmd = fmt.Sprintf(`echo '%s' > "%s"`, requestParams.Content, requestParams.OldPath)
+	} else {
+		cmd = fmt.Sprintf(`echo '%s' > "%s" && mv "%s" "%s"`, requestParams.Content, requestParams.OldPath, requestParams.OldPath, requestParams.NewPath)
+	}
+	log.Println("cmd", cmd)
+	_, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
+
+	if err != nil {
+		app.ErrorLogger.Println("Get file content failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Get file content failed.",
+			Message:      nil,
+		})
+	}
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      "Update file success",
 	})
 }

@@ -2,11 +2,13 @@ import {
 	addFolderApi,
 	getContainerDetailApi,
 	getContainerFsApi,
+	getFileContentApi,
 	getListContainerApi,
 	killContainerApi,
 	removeContainerAPi,
 	removeEndpoinsApi,
 	restartContainerApi,
+	updateFileApi,
 	uploadToContainerApi,
 } from "@/services/api/container";
 import type { IContainerDetail } from "@/type/container_detail";
@@ -142,6 +144,40 @@ export const addFolderProxy = async (
 ): Promise<any> => {
 	try {
 		const apiRes = await addFolderApi(containerId, dstPath, name);
+		if (apiRes.data?.status !== 0) {
+			throw new Error(apiRes.data?.message || "Error");
+		}
+		return apiRes.data?.message;
+	} catch (err: any) {
+		console.log(err);
+	}
+	return null;
+};
+
+export const getFileContentProxy = async (
+	containerId: string,
+	path: string,
+): Promise<any> => {
+	try {
+		const apiRes = await getFileContentApi(containerId, path);
+		if (apiRes.data?.status !== 0) {
+			throw new Error(apiRes.data?.message || "Error");
+		}
+		return apiRes.data?.message;
+	} catch (err: any) {
+		console.log(err);
+	}
+	return null;
+};
+
+export const updateFileProxy = async (input: {
+	containerId: string;
+	oldPath: string;
+	newPath: string;
+	content: string;
+}): Promise<any> => {
+	try {
+		const apiRes = await updateFileApi(input);
 		if (apiRes.data?.status !== 0) {
 			throw new Error(apiRes.data?.message || "Error");
 		}
