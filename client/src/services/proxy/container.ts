@@ -1,5 +1,6 @@
 import {
 	addFolderApi,
+	createFileApi,
 	getContainerDetailApi,
 	getContainerFsApi,
 	getFileContentApi,
@@ -178,6 +179,23 @@ export const updateFileProxy = async (input: {
 }): Promise<any> => {
 	try {
 		const apiRes = await updateFileApi(input);
+		if (apiRes.data?.status !== 0) {
+			throw new Error(apiRes.data?.message || "Error");
+		}
+		return apiRes.data?.message;
+	} catch (err: any) {
+		console.log(err);
+	}
+	return null;
+};
+
+export const createFileProxy = async (input: {
+	containerId: string;
+	dstPath: string;
+	content: string;
+}): Promise<any> => {
+	try {
+		const apiRes = await createFileApi(input);
 		if (apiRes.data?.status !== 0) {
 			throw new Error(apiRes.data?.message || "Error");
 		}

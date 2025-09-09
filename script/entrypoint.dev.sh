@@ -5,8 +5,13 @@ PROJECT_NAME=portainer
 
 function init() {
   package_path="/app/runtimes/packages"
+  upload_path="/app/runtimes/upload"
   if [[ ! -e $package_path ]]; then
     mkdir $package_path
+  fi
+
+  if [[ ! -e $upload_path ]]; then
+    mkdir $upload_path
   fi
   
   cp $(which tree) $package_path/tree

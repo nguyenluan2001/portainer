@@ -4,6 +4,7 @@ command=$1
 PROJECT_PATH="."
 
 function build(){
+    docker image pull luannguyen2001/ntluan_base
     docker build -t portainer_dev_img -f Dockerfile.dev \
     --build-arg UID=${UID} \
     --build-arg GID=${GID} \

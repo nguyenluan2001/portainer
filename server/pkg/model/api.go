@@ -30,3 +30,8 @@ type UpdateFileRequest struct {
 	NewPath string `json:"newPath" form:"newPath"`
 	Content string `json:"content" form:"content"`
 }
+
+type CreateFileRequest struct {
+	DstPath string `json:"dstPath" form:"dstPath"`
+	Content string `json:"content" form:"content"`
+}

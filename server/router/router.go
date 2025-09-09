@@ -42,6 +42,7 @@ func InitRouter(app *app.App) {
 	apiRouter.Post("/container/fs/add-folder/:containerId", app.AddFolderContainer)
 	apiRouter.Get("/container/fs/get-file/:containerId", app.GetFileContentContainer)
 	apiRouter.Post("/container/fs/update-file/:containerId", app.UpdateFileContainer)
+	apiRouter.Post("/container/fs/create-file/:containerId", app.CreateFileContainer)
 
 	// WebSocket route handler
 	socketRouter := router.Group(config.API_SOCKET_PREFIX_PATH)

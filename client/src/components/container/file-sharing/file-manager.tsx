@@ -17,6 +17,7 @@ import {
 	ClockClockwiseIcon,
 	DownloadSimpleIcon,
 	FileIcon,
+	FilePlusIcon,
 	FolderIcon,
 	FolderSimplePlusIcon,
 	HouseIcon,
@@ -64,6 +65,7 @@ const FileManager: FC<Props> = ({ containerId }) => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
 	const [openModalAddFolder, setOpenModalAddFolder] = useState(false);
+	const [openModalAddFile, setOpenModalAddFile] = useState(false);
 
 	const queryClient = useQueryClient();
 	const {
@@ -176,6 +178,12 @@ const FileManager: FC<Props> = ({ containerId }) => {
 			onClick: () => setOpenModalAddFolder(true),
 		},
 		{
+			key: "2",
+			label: "Add file",
+			icon: <FilePlusIcon />,
+			onClick: () => setOpenModalAddFile(true),
+		},
+		{
 			type: "divider",
 		},
 		{
@@ -259,11 +267,11 @@ const FileManager: FC<Props> = ({ containerId }) => {
 				return (
 					<div className="flex items-center gap-[8px]">
 						{!isDirectory && (
-							<FileEditor
-								title="Edit file"
-								containerId={containerId}
-								file={record}
-							/>
+							<FileEditor containerId={containerId} file={record}>
+								<Button size="small" icon={<PencilSimpleLineIcon />}>
+									Edit
+								</Button>
+							</FileEditor>
 						)}
 						{!isDirectory && (
 							<Button
@@ -332,6 +340,12 @@ const FileManager: FC<Props> = ({ containerId }) => {
 							</a>
 						);
 					}}
+				/>
+				<FileEditor
+					containerId={containerId}
+					folder_path={path}
+					open={openModalAddFile}
+					setOpen={setOpenModalAddFile}
 				/>
 				<div className="flex items-center gap-[8px]">
 					{selectedRowKeys?.length > 0 && (

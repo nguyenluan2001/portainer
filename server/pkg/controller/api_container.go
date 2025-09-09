@@ -427,11 +427,12 @@ func (app *App) UpdateFileContainer(ctx *fiber.Ctx) error {
 	cmd := ""
 
 	if requestParams.OldPath == requestParams.NewPath {
-		cmd = fmt.Sprintf(`echo '%s' > "%s"`, requestParams.Content, requestParams.OldPath)
+		cmd = fmt.Sprintf("printf '%%s' '%%s' > '%s'", requestParams.Content, requestParams.OldPath)
 	} else {
-		cmd = fmt.Sprintf(`echo '%s' > "%s" && mv "%s" "%s"`, requestParams.Content, requestParams.OldPath, requestParams.OldPath, requestParams.NewPath)
+		cmd = fmt.Sprintf("printf '%%s' '%%s' > '%s' && mv '%s' '%s'", fmt.Sprintf(`%s`, requestParams.Content), requestParams.OldPath, requestParams.OldPath, requestParams.NewPath)
 	}
 	log.Println("cmd", cmd)
+	log.Println("content", fmt.Sprintf(`%%s`, requestParams.Content))
 	_, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
 
 	if err != nil {
@@ -446,5 +447,37 @@ func (app *App) UpdateFileContainer(ctx *fiber.Ctx) error {
 		Status:       0,
 		ErrorMessage: "",
 		Message:      "Update file success",
+	})
+}
+
+func (app *App) CreateFileContainer(ctx *fiber.Ctx) error {
+	containerId := ctx.Params("containerId")
+	var requestParams = new(model.CreateFileRequest)
+
+	if err := ctx.BodyParser(requestParams); err != nil {
+		app.AppLogger.ErrorLogger.Println("BodyParser failed: ", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Create file failed.",
+			Message:      nil,
+		})
+	}
+
+	cmd := fmt.Sprintf(`echo '%s' > "%s"`, requestParams.Content, requestParams.DstPath)
+	log.Println("cmd", cmd)
+	_, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
+
+	if err != nil {
+		app.ErrorLogger.Println("Create file content failed.", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Create file content failed.",
+			Message:      nil,
+		})
+	}
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      "Create file success",
 	})
 }

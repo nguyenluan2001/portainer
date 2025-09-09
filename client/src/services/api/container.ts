@@ -2,6 +2,7 @@ import type { RcFile } from "antd/es/upload";
 import { apiInstance } from ".";
 import {
 	ADD_FOLER_PATH,
+	CREATE_FILE_PATH,
 	GET_CONTAINER_DETAIL_PATH,
 	GET_CONTAINER_FS_PATH,
 	GET_FILE_CONTENT_PATH,
@@ -94,6 +95,21 @@ export const updateFileApi = ({
 	return apiInstance.post(join(UPDATE_FILE_PATH, containerId), {
 		oldPath,
 		newPath,
+		content,
+	});
+};
+
+export const createFileApi = ({
+	containerId,
+	dstPath,
+	content,
+}: {
+	containerId: string;
+	dstPath: string;
+	content: string;
+}) => {
+	return apiInstance.post(join(CREATE_FILE_PATH, containerId), {
+		dstPath,
 		content,
 	});
 };

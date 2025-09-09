@@ -1,6 +1,13 @@
 import { PencilSimpleLineIcon } from "@phosphor-icons/react";
-import { Button, Modal } from "antd";
-import { useEffect, useState, type FC } from "react";
+import { Button, Input, Modal } from "antd";
+import React, {
+	useEffect,
+	useState,
+	type Dispatch,
+	type FC,
+	type ReactElement,
+	type ReactNode,
+} from "react";
 import {
 	type Monaco,
 	default as MonacoEditor,
@@ -9,6 +16,7 @@ import {
 import type { IFilesystem } from "@/type/filesystem";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	createFileProxy,
 	getFileContentProxy,
 	updateFileProxy,
 } from "@/services/proxy/container";
@@ -18,13 +26,23 @@ import { useQueryKeysFactory } from "@/hooks/react-query/useQueryKeysFactory";
 import { toast } from "react-toastify";
 
 interface Props {
-	title: string;
 	containerId: string;
-	file: IFilesystem;
+	file?: IFilesystem;
+	folder_path?: string;
+	children?: ReactElement;
+	open?: boolean;
+	setOpen?: Dispatch<React.SetStateAction<boolean>>;
 }
-const FileEditor: FC<Props> = ({ title, containerId, file }) => {
-	const [open, setOpen] = useState(false);
-	const [code, setCode] = useState<string>("Hello world");
+const FileEditor: FC<Props> = ({
+	containerId,
+	file,
+	folder_path,
+	children,
+	open,
+	setOpen,
+}) => {
+	const [internalOpen, setInternalOpen] = useState(false);
+	const [code, setCode] = useState<string>("");
 	const [language, setLanguage] = useState("plaintext");
 	const [filename, setFilename] = useState("");
 
@@ -33,15 +51,19 @@ const FileEditor: FC<Props> = ({ title, containerId, file }) => {
 		containerKeys: { getFilesystem, getFileContent },
 	} = useQueryKeysFactory();
 	const { data, isLoading, isFetching } = useQuery({
-		queryKey: getFileContent(containerId, file.path),
-		queryFn: () => getFileContentProxy(containerId, file.path),
-		enabled: !!containerId && !!file.path && open,
+		queryKey: getFileContent(containerId, file?.path),
+		queryFn: () => {
+			if (!file) return "";
+			return getFileContentProxy(containerId, file?.path);
+		},
+		enabled: !!containerId && !!file?.path && internalOpen,
 	});
 
 	const updateFileMutation = useMutation({
 		mutationFn: (input: any) => updateFileProxy(input),
-		onSuccess(data, variables, context) {
+		onSuccess(data) {
 			if (!data) return toast.error("Update file failed. Please try again");
+			if (!file) return;
 			const oldPath = file.path;
 			const newPath = file.path.replace(file.name, filename);
 			if (oldPath === newPath) {
@@ -50,8 +72,20 @@ const FileEditor: FC<Props> = ({ title, containerId, file }) => {
 				});
 				return;
 			}
+			setFilename("");
+			setCode("");
+			onClose();
+			queryClient.invalidateQueries({
+				queryKey: getFilesystem(containerId),
+			});
+		},
+	});
 
-			setOpen(false);
+	const createFileMutation = useMutation({
+		mutationFn: (input: any) => createFileProxy(input),
+		onSuccess(data) {
+			if (!data) return toast.error("Create file failed. Please try again");
+			onClose();
 			queryClient.invalidateQueries({
 				queryKey: getFilesystem(containerId),
 			});
@@ -59,25 +93,47 @@ const FileEditor: FC<Props> = ({ title, containerId, file }) => {
 	});
 
 	useEffect(() => {
-		if (isLoading || isFetching) return;
+		if (isLoading || isFetching || !file) return;
 		setCode(data);
-		setLanguage(getFileLanguage(file.name));
+		setLanguage(getFileLanguage(file?.name));
 	}, [data, isLoading, isFetching]);
 
 	useEffect(() => {
+		if (!file) return;
 		setFilename(file.name);
-	}, [file.name]);
+	}, [file, file?.name]);
+
+	const onClose = () => {
+		if (children) {
+			return setInternalOpen(false);
+		}
+		setOpen(false);
+	};
 
 	const onEditChange = (value: string | undefined) => {
 		if (value === undefined) return;
 		setCode(value);
 	};
 
-	const onSave = async () => {
+	const onSave = () => {
+		if (!file) return onCreate();
+		onUpdate();
+	};
+
+	const onUpdate = async () => {
+		if (!file) return;
 		await updateFileMutation.mutateAsync({
 			containerId,
-			oldPath: file.path,
-			newPath: file.path.replace(file.name, filename),
+			oldPath: file?.path,
+			newPath: file?.path.replace(file.name, filename),
+			content: code,
+		});
+	};
+
+	const onCreate = async () => {
+		await createFileMutation.mutateAsync({
+			containerId,
+			dstPath: [folder_path, filename]?.join("/"),
 			content: code,
 		});
 	};
@@ -85,12 +141,24 @@ const FileEditor: FC<Props> = ({ title, containerId, file }) => {
 		<>
 			<Modal
 				title={
-					<Paragraph editable={{ onChange: setFilename }}>{filename}</Paragraph>
+					<div className="w-[calc(100%-30px)]">
+						{file ? (
+							<Paragraph editable={{ onChange: setFilename }}>
+								{filename}
+							</Paragraph>
+						) : (
+							<Input
+								placeholder="Input filename"
+								className="w-full"
+								onChange={(e) => setFilename(e?.target?.value)}
+							/>
+						)}
+					</div>
 				}
 				centered
-				open={open}
+				open={internalOpen || open}
 				onOk={onSave}
-				onCancel={() => setOpen(false)}
+				onCancel={onClose}
 				okText="Save"
 				okButtonProps={{
 					loading: updateFileMutation.isPending,
@@ -117,13 +185,10 @@ const FileEditor: FC<Props> = ({ title, containerId, file }) => {
 					/>
 				</div>
 			</Modal>
-			<Button
-				size="small"
-				icon={<PencilSimpleLineIcon />}
-				onClick={() => setOpen(true)}
-			>
-				Edit
-			</Button>
+			{children &&
+				React.cloneElement(children, {
+					onClick: () => setInternalOpen(true),
+				})}
 		</>
 	);
 };
