@@ -1,4 +1,5 @@
 import {
+	DatabaseIcon,
 	FileIcon,
 	GlobeIcon,
 	ShareNetworkIcon,
@@ -67,6 +68,26 @@ const Sidebar = () => {
 							<div className="flex items-center gap-2">
 								<SquaresFourIcon />
 								<p className="text-foreground">File explorer</p>
+							</div>
+						),
+					},
+					{
+						key: "5",
+						href: "#volume",
+						title: (
+							<div className="flex items-center gap-2">
+								<DatabaseIcon />
+								<p className="text-foreground">Volume</p>
+							</div>
+						),
+					},
+					{
+						key: "6",
+						href: "#networking",
+						title: (
+							<div className="flex items-center gap-2">
+								<ShareNetworkIcon />
+								<p className="text-foreground">Networking</p>
 							</div>
 						),
 					},

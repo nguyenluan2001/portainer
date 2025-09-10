@@ -45,3 +45,9 @@ export const getFileLanguage = (filename: string): string => {
 	if (typeof languageMap[extension] === "undefined") return languageMap.txt;
 	return languageMap[extension];
 };
+
+export const checkPressSave = (e: KeyboardEvent) => {
+	const { key, ctrlKey } = e;
+	if (key === "s" && ctrlKey) return true;
+	return false;
+};

@@ -19,7 +19,7 @@ export interface IContainerDetail {
 	ExecIDs: string[];
 	HostConfig: HostConfig;
 	GraphDriver: GraphDriver;
-	Mounts: any[];
+	Mounts: Mounts[];
 	Config: Config2;
 	NetworkSettings: NetworkSettings;
 }
@@ -208,4 +208,13 @@ export interface Bridge {
 	GlobalIPv6Address: string;
 	GlobalIPv6PrefixLen: number;
 	DNSNames: any;
+}
+
+export interface Mounts {
+	Destination: string;
+	Mode: string;
+	Propagation: string;
+	RW: boolean;
+	Source: string;
+	Type: string;
 }

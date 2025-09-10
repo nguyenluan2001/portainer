@@ -1,29 +1,25 @@
-import { PencilSimpleLineIcon } from "@phosphor-icons/react";
-import { Button, Input, Modal } from "antd";
-import React, {
-	useEffect,
-	useMemo,
-	useState,
-	type Dispatch,
-	type FC,
-	type ReactElement,
-	type ReactNode,
-} from "react";
-import {
-	type Monaco,
-	default as MonacoEditor,
-	useMonaco,
-} from "@monaco-editor/react";
-import type { IFilesystem } from "@/type/filesystem";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryKeysFactory } from "@/hooks/react-query/useQueryKeysFactory";
 import {
 	createFileProxy,
 	getFileContentProxy,
 	updateFileProxy,
 } from "@/services/proxy/container";
+import type { IFilesystem } from "@/type/filesystem";
 import { getFileLanguage } from "@/utils/editor";
+import { default as MonacoEditor, type Monaco } from "@monaco-editor/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Input, Modal, Tooltip } from "antd";
 import Paragraph from "antd/es/typography/Paragraph";
-import { useQueryKeysFactory } from "@/hooks/react-query/useQueryKeysFactory";
+import type { editor } from "monaco-editor";
+import React, {
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type Dispatch,
+	type FC,
+	type ReactElement,
+} from "react";
 import { toast } from "react-toastify";
 
 interface Props {
@@ -43,9 +39,11 @@ const FileEditor: FC<Props> = ({
 	setOpen,
 }) => {
 	const [internalOpen, setInternalOpen] = useState(false);
+	const [openWarning, setOpenWarning] = useState(false);
 	const [code, setCode] = useState<string>("");
 	const [language, setLanguage] = useState("plaintext");
 	const [filename, setFilename] = useState("");
+	const codeRef = useRef("");
 
 	const queryClient = useQueryClient();
 	const {
@@ -105,6 +103,10 @@ const FileEditor: FC<Props> = ({
 	}, [file, file?.name]);
 
 	const onClose = () => {
+		if (code !== data) {
+			setOpenWarning(true);
+			return;
+		}
 		if (children) {
 			return setInternalOpen(false);
 		}
@@ -114,6 +116,7 @@ const FileEditor: FC<Props> = ({
 	const onEditChange = (value: string | undefined) => {
 		if (value === undefined) return;
 		setCode(value);
+		codeRef.current = value;
 	};
 
 	const onSave = () => {
@@ -122,12 +125,13 @@ const FileEditor: FC<Props> = ({
 	};
 
 	const onUpdate = async () => {
+		console.log("onUpdate===");
 		if (!file) return;
 		await updateFileMutation.mutateAsync({
 			containerId,
 			oldPath: file?.path,
 			newPath: file?.path.replace(file.name, filename),
-			content: code,
+			content: codeRef.current,
 		});
 	};
 
@@ -138,6 +142,14 @@ const FileEditor: FC<Props> = ({
 			content: code,
 		});
 	};
+	function handleEditorDidMount(
+		editor: editor.IStandaloneCodeEditor,
+		monaco: Monaco,
+	) {
+		editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+			onSave();
+		});
+	}
 
 	const isContentChanged = useMemo(() => {
 		return code !== data;
@@ -173,6 +185,21 @@ const FileEditor: FC<Props> = ({
 				classNames={{
 					content: "h-full",
 				}}
+				footer={
+					<div className="w-full flex items-center justify-end gap-[8px]">
+						<Button onClick={onClose}>Cancel</Button>
+						<Tooltip title="Ctrl+S">
+							<Button
+								loading={updateFileMutation.isPending}
+								disabled={!isContentChanged}
+								onClick={onSave}
+								type="primary"
+							>
+								Save
+							</Button>
+						</Tooltip>
+					</div>
+				}
 			>
 				<div className="h-[70vh]">
 					<MonacoEditor
@@ -181,7 +208,7 @@ const FileEditor: FC<Props> = ({
 						defaultLanguage="plaintext"
 						defaultValue={"// your code goes here"}
 						value={code}
-						// onMount={handleEditorDidMount}
+						onMount={handleEditorDidMount}
 						language={language}
 						onChange={onEditChange}
 						options={{
@@ -191,8 +218,43 @@ const FileEditor: FC<Props> = ({
 					/>
 				</div>
 			</Modal>
+			<Modal
+				title={`Do you want to save the changes you made to file ${file?.name}`}
+				centered
+				open={openWarning}
+				onCancel={() => setOpenWarning(false)}
+				width="500px"
+				footer={
+					<div className="w-full flex items-center justify-end gap-[8px]">
+						<Button
+							onClick={() => {
+								setOpenWarning(false);
+								setInternalOpen(false);
+							}}
+						>
+							Don't save
+						</Button>
+						<Button onClick={() => setOpenWarning(false)}>Cancel</Button>
+						<Tooltip title="Ctrl+S">
+							<Button
+								loading={updateFileMutation.isPending}
+								disabled={!isContentChanged}
+								onClick={() => {
+									onSave();
+									setOpenWarning(false);
+								}}
+								type="primary"
+							>
+								Save
+							</Button>
+						</Tooltip>
+					</div>
+				}
+			>
+				<div>You changes will be lost if you don't save theme.</div>
+			</Modal>
 			{children &&
-				React.cloneElement(children, {
+				React.cloneElement(children as any, {
 					onClick: () => setInternalOpen(true),
 				})}
 		</>

@@ -71,15 +71,6 @@ const LogContainer: FC<Props> = ({ containerId }) => {
 			}
 			className="!h-[500px]"
 		>
-			{/* <div
-				className={classNames(
-					"w-full max-h-[300px] bg-background text-foreground p-3 [&_.xterm-helpers]:size-0 overflow-y-auto",
-					{
-						"invisible h-0": !isConnected,
-					},
-				)}
-				id={terminalId}
-			/> */}
 			<div className="max-h-[520px]">
 				<LazyLog ref={logRef} {...args} />
 			</div>

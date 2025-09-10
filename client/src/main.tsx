@@ -7,6 +7,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
+import { checkPressSave } from "./utils/editor";
 
 declare global {
 	interface Window {
@@ -25,6 +26,14 @@ const queryClient = new QueryClient({
 });
 const router = createRouter({
 	routeTree,
+});
+window.addEventListener("keydown", (e) => {
+	console.log("e", e);
+	const isPressSave = checkPressSave(e);
+	if (isPressSave) {
+		e.preventDefault();
+		e.stopPropagation();
+	}
 });
 
 createRoot(document.getElementById("root")!).render(

@@ -1,9 +1,11 @@
 import FileSharing from "@/components/container/file-sharing";
 import LogContainer from "@/components/container/log";
+import Networking from "@/components/container/networking";
 import Overview from "@/components/container/overview";
 import Sidebar from "@/components/container/sidebar";
 import Terminal from "@/components/container/terminal";
 import Toolbar from "@/components/container/toolbar/toolbar";
+import Volume from "@/components/container/volume";
 import { getContainerDetailProxy } from "@/services/proxy/container";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -32,6 +34,8 @@ function RouteComponent() {
 					<Terminal />
 					<LogContainer containerId={containerId} />
 					<FileSharing containerId={containerId} />
+					<Volume mounts={containerDetail?.Mounts} />
+					<Networking networks={containerDetail?.NetworkSettings?.Networks} />
 				</div>
 			</div>
 		</div>
