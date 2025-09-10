@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 // createTarArchive creates an in-memory tar archive from a single file.
@@ -56,4 +57,14 @@ func CreateTarArchive(filePath string) (io.Reader, error) {
 
 	// Return the buffer as an io.Reader
 	return &buf, nil
+}
+
+func ContentReplacer(content string) string {
+	replacer := strings.NewReplacer(
+		"\n", "\\n",
+		"\r", "",
+		"\t", "\\t",
+		"\b", "\\b",
+	)
+	return replacer.Replace(content)
 }

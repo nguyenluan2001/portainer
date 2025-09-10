@@ -2,6 +2,7 @@ import { PencilSimpleLineIcon } from "@phosphor-icons/react";
 import { Button, Input, Modal } from "antd";
 import React, {
 	useEffect,
+	useMemo,
 	useState,
 	type Dispatch,
 	type FC,
@@ -107,7 +108,7 @@ const FileEditor: FC<Props> = ({
 		if (children) {
 			return setInternalOpen(false);
 		}
-		setOpen(false);
+		setOpen?.(false);
 	};
 
 	const onEditChange = (value: string | undefined) => {
@@ -137,6 +138,10 @@ const FileEditor: FC<Props> = ({
 			content: code,
 		});
 	};
+
+	const isContentChanged = useMemo(() => {
+		return code !== data;
+	}, [code, data]);
 	return (
 		<>
 			<Modal
@@ -162,6 +167,7 @@ const FileEditor: FC<Props> = ({
 				okText="Save"
 				okButtonProps={{
 					loading: updateFileMutation.isPending,
+					disabled: !isContentChanged,
 				}}
 				width="60vw"
 				classNames={{

@@ -427,12 +427,12 @@ func (app *App) UpdateFileContainer(ctx *fiber.Ctx) error {
 	cmd := ""
 
 	if requestParams.OldPath == requestParams.NewPath {
-		cmd = fmt.Sprintf("printf '%%s' '%%s' > '%s'", requestParams.Content, requestParams.OldPath)
+		cmd = fmt.Sprintf(`printf '%s' > '%s'`, utils.ContentReplacer(requestParams.Content), requestParams.OldPath)
 	} else {
-		cmd = fmt.Sprintf("printf '%%s' '%%s' > '%s' && mv '%s' '%s'", fmt.Sprintf(`%s`, requestParams.Content), requestParams.OldPath, requestParams.OldPath, requestParams.NewPath)
+		cmd = fmt.Sprintf("printf '%s' > '%s' && mv '%s' '%s'", utils.ContentReplacer(requestParams.Content), requestParams.OldPath, requestParams.OldPath, requestParams.NewPath)
 	}
 	log.Println("cmd", cmd)
-	log.Println("content", fmt.Sprintf(`%%s`, requestParams.Content))
+	log.Println("content", fmt.Sprintf(`%q`, requestParams.Content))
 	_, err := docker.FsManageContainer(app.AppCtx, app.DockerCLI, containerId, cmd)
 
 	if err != nil {
