@@ -11,3 +11,5 @@ export const ADD_FOLER_PATH = "/api/container/fs/add-folder";
 export const GET_FILE_CONTENT_PATH = "/api/container/fs/get-file";
 export const UPDATE_FILE_PATH = "/api/container/fs/update-file";
 export const CREATE_FILE_PATH = "/api/container/fs/create-file";
+//IMAGE
+export const GET_IMAGE_LIST_API = "/api/image/list";

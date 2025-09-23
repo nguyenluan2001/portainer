@@ -12,10 +12,6 @@ import (
 	"github.com/nguyenluan2001/portainer/server/pkg/utils"
 )
 
-func CreateDockerClient() (*client.Client, error) {
-	return client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-}
-
 func GetContainerList(appCtx context.Context, cli *client.Client) ([]container.Summary, error) {
 	return cli.ContainerList(appCtx, container.ListOptions{
 		All:    true,

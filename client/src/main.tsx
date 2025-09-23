@@ -81,13 +81,13 @@ createRoot(document.getElementById("root")!).render(
 							colorTextHeading: "var(--bar-foreground)",
 							colorTextBase: "var(--bar-foreground)",
 						},
-						Segmented: {
-							trackBg: "var(--bg-secondary)",
-							itemActiveBg: "var(--bg-primary)",
-							itemSelectedBg: "var(--bg-primary)",
-							itemColor: "var(--text-primary)",
-							itemSelectedColor: "var(--text-primary)",
-						},
+						// Segmented: {
+						// 	trackBg: "var(--muted)",
+						// 	itemActiveBg: "var((--background)",
+						// 	itemSelectedBg: "var(--background)",
+						// 	itemColor: "var(--foreground)",
+						// 	itemSelectedColor: "var(--foreground)",
+						// },
 						Tag: {
 							defaultBg: "var(--bg-secondary)",
 							colorText: "var(--text-primary)",

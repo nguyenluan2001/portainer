@@ -1,9 +1,9 @@
 import { flattenDeep } from 'lodash';
 
 export const templateKeys = {
-    prefix: ['bookmark'],
+    prefix: ['image'],
     createKey: (...args: any[]) => flattenDeep([templateKeys.prefix, args]),
 
-    getBookmarkList: (...args: any) =>
-        templateKeys.createKey(['bookmark', ...args])
+    getImageList: (...args: any) =>
+        templateKeys.createKey(['get-image-list', ...args])
 };

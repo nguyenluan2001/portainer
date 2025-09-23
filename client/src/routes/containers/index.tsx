@@ -1,3 +1,4 @@
+import CreateContainerForm from "@/components/container/create-form"
 import Layout from "@/components/main/layout"
 import { getListContainerProxy } from '@/services/proxy/container'
 import type { IContainerItem } from '@/type/container'
@@ -66,6 +67,9 @@ const ContainerPage = () => {
     return (
         <Layout title="Containers" description="View and Manage your Containers">
             <div className="w-full h-full">
+                <div className="w-full flex justify-end">
+                    <CreateContainerForm />
+                </div>
                 <Table
                     columns={columns}
                     dataSource={data?.containers || []}

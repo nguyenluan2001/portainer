@@ -235,9 +235,12 @@
 	"[go]": {
 		"editor.defaultFormatter": "golang.go"
 	},
-	"biome.configurationPath": "./client/biome.json",
-	"biome.lsp.bin": "./client/node_modules/@biomejs/biome/bin/biome",
+	"biome.configurationPath": "/home/luannguyen/Workspace/portainer/client/biome.json",
+	"biome.lsp.bin": "/home/luannguyen/Workspace/portainer/client/node_modules/.bin/biome",
 	"[typescriptreact]": {
-		"editor.defaultFormatter": "biomejs.biome"
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
 	}
 }

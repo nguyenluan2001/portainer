@@ -3,10 +3,12 @@
  * @see - https://tkdodo.eu/blog/effective-react-query-keys#use-query-key-factories
  */
 
-import { templateKeys as containerKeys } from "./project";
+import { templateKeys as containerKeys } from "./container";
+import { templateKeys as imageKeys } from "./image";
 
 export const useQueryKeysFactory = () => {
 	return {
 		containerKeys,
+		imageKeys
 	};
 };

@@ -1,6 +1,9 @@
 package model
 
-import "github.com/docker/docker/api/types/container"
+import (
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
+)
 
 type ApiContent struct {
 	Status       int         `json:"status"`
@@ -34,4 +37,8 @@ type UpdateFileRequest struct {
 type CreateFileRequest struct {
 	DstPath string `json:"dstPath" form:"dstPath"`
 	Content string `json:"content" form:"content"`
+}
+
+type GetImageResponse struct {
+	Images []image.Summary `json:"images"`
 }
