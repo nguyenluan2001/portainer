@@ -31,6 +31,49 @@ func (app *App) GetContainers(ctx *fiber.Ctx) error {
 		},
 	})
 }
+
+func (app *App) CreateContainer(ctx *fiber.Ctx) error {
+	var requestParams model.CreateContainerRequest
+
+	if err := ctx.BodyParser(requestParams); err != nil {
+		app.AppLogger.ErrorLogger.Println("BodyParser failed: ", err)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Create container failed.",
+			Message:      nil,
+		})
+	}
+
+	createContainerResponse, createErr := docker.CreateContainer(app.AppCtx, app.DockerCLI, &requestParams.Config, &requestParams.HostConfig, &requestParams.NetworkingConfig, &requestParams.Platform, requestParams.ContainerName)
+
+	if createErr != nil {
+		app.ErrorLogger.Println("Create container failed.", createErr)
+		return ctx.JSON(model.ApiContent{
+			Status:       1,
+			ErrorMessage: "Create container failed.",
+			Message:      nil,
+		})
+	}
+
+	if requestParams.IsStart {
+		startErr := docker.StartContainer(app.AppCtx, app.DockerCLI, createContainerResponse.ID)
+		if startErr != nil {
+			app.ErrorLogger.Println("Create container failed.", startErr)
+			return ctx.JSON(model.ApiContent{
+				Status:       1,
+				ErrorMessage: "Create container failed.",
+				Message:      nil,
+			})
+		}
+	}
+
+	return ctx.JSON(model.ApiContent{
+		Status:       0,
+		ErrorMessage: "",
+		Message:      createContainerResponse,
+	})
+}
+
 func (app *App) GetContainerDetail(ctx *fiber.Ctx) error {
 	containerId := ctx.Params("containerId")
 	containerDetail, err := docker.GetContainerDetail(app.AppCtx, app.DockerCLI, containerId)

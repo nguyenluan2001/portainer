@@ -8,8 +8,10 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/nguyenluan2001/portainer/server/pkg/utils"
+	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 func GetContainerList(appCtx context.Context, cli *client.Client) ([]container.Summary, error) {
@@ -17,6 +19,14 @@ func GetContainerList(appCtx context.Context, cli *client.Client) ([]container.S
 		All:    true,
 		Latest: true,
 	})
+}
+
+func CreateContainer(appCtx context.Context,
+	cli *client.Client, config *container.Config,
+	hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig,
+	platform *v1.Platform, containerName string) (container.CreateResponse, error) {
+
+	return cli.ContainerCreate(appCtx, config, hostConfig, networkingConfig, platform, containerName)
 }
 
 func GetContainerDetail(appCtx context.Context, cli *client.Client, containerId string) (container.InspectResponse, error) {
@@ -125,6 +135,10 @@ func LogContainer(appCtx context.Context, cli *client.Client, containerId string
 		Follow:     true,
 		Details:    true,
 	})
+}
+
+func StartContainer(appCtx context.Context, cli *client.Client, containerId string) error {
+	return cli.ContainerStart(appCtx, containerId, container.StartOptions{})
 }
 
 // func CreateContainer(appCtx context.Context, cli *client.Client, mountDir string, version models.Version) (container.CreateResponse, error) {
