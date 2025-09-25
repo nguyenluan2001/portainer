@@ -30,8 +30,8 @@ func InitRouter(app *app.App) {
 	apiRouter.Get("/containers", app.GetContainers)
 	apiRouter.Get("/containers/:containerId", app.GetContainerDetail)
 
-	containerRouter := apiRouter.Group("/containers")
-	containerRouter.Post("/create", app.GetContainerDetail)
+	containerRouter := apiRouter.Group("/container")
+	containerRouter.Post("/create", app.CreateContainer)
 	containerRouter.Get("/detail/:containerId", app.GetContainerDetail)
 	containerRouter.Get("/kill/:containerId", app.KillContainer)
 	containerRouter.Get("/restart/:containerId", app.RestartContainer)

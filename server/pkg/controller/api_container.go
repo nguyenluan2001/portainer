@@ -35,7 +35,7 @@ func (app *App) GetContainers(ctx *fiber.Ctx) error {
 func (app *App) CreateContainer(ctx *fiber.Ctx) error {
 	var requestParams model.CreateContainerRequest
 
-	if err := ctx.BodyParser(requestParams); err != nil {
+	if err := ctx.BodyParser(&requestParams); err != nil {
 		app.AppLogger.ErrorLogger.Println("BodyParser failed: ", err)
 		return ctx.JSON(model.ApiContent{
 			Status:       1,

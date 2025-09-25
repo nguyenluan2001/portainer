@@ -25,6 +25,10 @@ export const getContainerDetailApi = (containerId: string) => {
 	return apiInstance.get(join(GET_CONTAINER_DETAIL_PATH, containerId));
 };
 
+// export const createContainerApi = (params:ICrea) => {
+// 	return apiInstance.get(join(GET_CONTAINER_DETAIL_PATH, containerId));
+// };
+
 export const killContainerApi = (containerId: string) => {
 	return apiInstance.get(join(KILL_CONTAINER_PATH, containerId));
 };

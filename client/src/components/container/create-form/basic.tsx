@@ -4,7 +4,7 @@ import type { IImageItem } from "@/type/image"
 import { useQuery } from "@tanstack/react-query"
 import { Form, Input, Segmented, Select, type FormInstance } from "antd"
 import type { DefaultOptionType } from "antd/es/select"
-import { useMemo, useState, type FC } from "react"
+import { useEffect, useMemo, useState, type FC } from "react"
 
 interface Props {
     form: FormInstance<any>
@@ -42,6 +42,7 @@ const BasicForm: FC<Props> = ({ form }) => {
             images: [] as IImageItem[]
         }
     })
+
     console.log('images', images)
     const imageOptions: DefaultOptionType[] = useMemo(() => {
         if (isLoading || isFetching) return [] as DefaultOptionType[]
@@ -65,16 +66,18 @@ const BasicForm: FC<Props> = ({ form }) => {
                 <div className="w-full flex items-center justify-between">
                     <p>Image</p>
                     <Segmented
+                        value={imageLocation}
                         options={Object.keys(IMAGE_LOCATION)}
                         onChange={(value) => {
                             setImageLocation(value)
+                            form.resetFields(['image'])
                         }}
                     />
                 </div>
             }>
                 {
                     imageLocation === IMAGE_LOCATION.Local && (
-                        <Select options={imageOptions} />
+                        <Select options={imageOptions} placeholder="Select image" />
                     )
                 }
                 {
