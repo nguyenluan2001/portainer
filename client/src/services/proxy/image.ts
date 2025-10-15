@@ -1,7 +1,7 @@
 import type { IImageItem } from "@/type/image";
 import { getImageListApi } from "../api/image";
 
-export const getImageListProxy = async (): Promise<IImageItem[] | null> => {
+export const getImageListProxy = async (): Promise<IImageItem[]> => {
 	try {
 		const apiRes = await getImageListApi();
 		if (apiRes.data?.status !== 0) {
@@ -11,5 +11,5 @@ export const getImageListProxy = async (): Promise<IImageItem[] | null> => {
 	} catch (err: any) {
 		console.log(err);
 	}
-	return null;
+	return [];
 };

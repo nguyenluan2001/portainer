@@ -48,8 +48,13 @@ func InitRouter(app *app.App) {
 	containerRouter.Post("/fs/update-file/:containerId", app.UpdateFileContainer)
 	containerRouter.Post("/fs/create-file/:containerId", app.CreateFileContainer)
 
+	// Image router
 	imageRouter := apiRouter.Group("/image")
 	imageRouter.Get("list", app.GetImageList)
+
+	//Networking router
+	networkingRouter := apiRouter.Group("/networking")
+	networkingRouter.Get("list", app.GetNetworkList)
 
 	// WebSocket route handler
 	socketRouter := router.Group(config.API_SOCKET_PREFIX_PATH)

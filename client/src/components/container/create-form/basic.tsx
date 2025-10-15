@@ -1,18 +1,17 @@
+import { IMAGE_LOCATION } from "@/constant/container"
 import { useQueryKeysFactory } from "@/hooks/react-query/useQueryKeysFactory"
 import { getImageListProxy } from "@/services/proxy/image"
 import type { IImageItem } from "@/type/image"
 import { useQuery } from "@tanstack/react-query"
 import { Form, Input, Segmented, Select, type FormInstance } from "antd"
+import { useWatch } from "antd/es/form/Form"
 import type { DefaultOptionType } from "antd/es/select"
 import { useEffect, useMemo, useState, type FC } from "react"
 
 interface Props {
     form: FormInstance<any>
 }
-const IMAGE_LOCATION = {
-    Local: 'Local',
-    Remote: 'Remote',
-}
+
 const RESTART_POLICY = [
     {
         label: 'No',
@@ -33,7 +32,10 @@ const RESTART_POLICY = [
 
 ]
 const BasicForm: FC<Props> = ({ form }) => {
-    const [imageLocation, setImageLocation] = useState(IMAGE_LOCATION.Local)
+    // const [imageLocation, setImageLocation] = useState(IMAGE_LOCATION.Local)
+    const imageLocation = useWatch(['imageLocation'], {
+        form,
+    })
     const { imageKeys: { getImageList } } = useQueryKeysFactory()
     const { data: { images }, isLoading, isFetching } = useQuery({
         queryKey: getImageList(),
@@ -62,6 +64,7 @@ const BasicForm: FC<Props> = ({ form }) => {
             <Form.Item name="name" label="Name">
                 <Input placeholder="e.g., my-container" />
             </Form.Item>
+            <Form.Item name="imageLocation" hidden />
             <Form.Item name="image" className="[&_label]:w-full" label={
                 <div className="w-full flex items-center justify-between">
                     <p>Image</p>
@@ -69,7 +72,8 @@ const BasicForm: FC<Props> = ({ form }) => {
                         value={imageLocation}
                         options={Object.keys(IMAGE_LOCATION)}
                         onChange={(value) => {
-                            setImageLocation(value)
+                            // setImageLocation(value)
+                            form.setFieldValue('imageLocation', value)
                             form.resetFields(['image'])
                         }}
                     />
@@ -77,7 +81,7 @@ const BasicForm: FC<Props> = ({ form }) => {
             }>
                 {
                     imageLocation === IMAGE_LOCATION.Local && (
-                        <Select options={imageOptions} placeholder="Select image" />
+                        <Select options={imageOptions} placeholder="Select image" showSearch />
                     )
                 }
                 {

@@ -235,8 +235,8 @@
 	"[go]": {
 		"editor.defaultFormatter": "golang.go"
 	},
-	"biome.configurationPath": "/home/luannguyen/Workspace/portainer/client/biome.json",
-	"biome.lsp.bin": "/home/luannguyen/Workspace/portainer/client/node_modules/.bin/biome",
+	"biome.configurationPath": "/home/luannguyen/Workspace/golang/portainer/client/biome.json",
+	"biome.lsp.bin": "/home/luannguyen/Workspace/golang/portainer/client/node_modules/@biomejs/biome/bin/biome",
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "vscode.typescript-language-features"
 	},

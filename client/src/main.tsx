@@ -28,7 +28,6 @@ const router = createRouter({
 	routeTree,
 });
 window.addEventListener("keydown", (e) => {
-	console.log("e", e);
 	const isPressSave = checkPressSave(e);
 	if (isPressSave) {
 		e.preventDefault();

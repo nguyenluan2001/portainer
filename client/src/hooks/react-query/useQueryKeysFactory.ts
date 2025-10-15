@@ -5,10 +5,12 @@
 
 import { templateKeys as containerKeys } from "./container";
 import { templateKeys as imageKeys } from "./image";
+import { templateKeys as networkKeys } from "./networking";
 
 export const useQueryKeysFactory = () => {
 	return {
 		containerKeys,
-		imageKeys
+		imageKeys,
+		networkKeys
 	};
 };

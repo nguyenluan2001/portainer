@@ -13,3 +13,6 @@ export const UPDATE_FILE_PATH = "/api/container/fs/update-file";
 export const CREATE_FILE_PATH = "/api/container/fs/create-file";
 //IMAGE
 export const GET_IMAGE_LIST_API = "/api/image/list";
+
+//NETWORK
+export const GET_NETWORK_LIST_PATH = "/api/networking/list";
